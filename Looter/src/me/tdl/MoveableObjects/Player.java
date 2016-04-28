@@ -9,33 +9,41 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import me.tdl.gameloop.GameLoop;
+import me.tdl.generator.World;
 import me.tdl.main.Animator;
 import me.tdl.main.Assets;
 import me.tdl.main.Check;
 import me.tdl.main.Main;
 import me.tdl.managers.GUImanager;
 import me.tdl.managers.HUDmanager;
+import me.tdl.managers.Mousemanager;
 import my.project.gop.main.Vector2F;
 
 public class Player implements KeyListener {
 
 	Vector2F pos;
-	private int width = 32;
-	private int height = 32;
+	private World mWorld;
+	private int mWidth = 32;
+	private int mHeight = 32;
 	private int mScale = 2;
 	
 	Color mColorTranslucent = new Color(0, 0, 0, 0);
 
-	private static boolean up, down, left, right;
-	private float maxSpeed = 3 * 32F;
-	private float fixDT = 1.5F / 60F;
-
+	private static boolean mMovingUp, mMovingDown, mMovingLeft, mMovingRight, mIsRunning;
+	
+	private final float RUN_SPEED = 48;
+	private float mCurrentMoveSpeed = 3 * 32F;
+	private float mFixDeltaTime = 1.5F / 60F;
 	private final float SLOWDOWN = 3F;
+	
+	Mousemanager mPlayerMM = new Mousemanager();
 
-	private float speedUP = 0;
-	private float speedDOWN = 0;
-	private float speedLEFT = 0;
-	private float speedRIGHT = 0;
+	private float mStartSpeedUp = 0;
+	private float mStartSpeedDown = 0;
+	private float mStartSpeedLeft = 0;
+	private float mStartSpeedRight = 0;
+	
+	private long mAnimationSpeed = 140;
 	
 	private HUDmanager mHud;
 	private GUImanager mGui;
@@ -64,15 +72,19 @@ public class Player implements KeyListener {
 		/*
 		 * set pos to put player in the middle of screen.
 		 */
-		pos = new Vector2F(Main.mWidth / 2 - width / 2, Main.mHeight / 2 - height / 2);
+		pos = new Vector2F(Main.mWidth / 2 - mWidth / 2, Main.mHeight / 2 - mHeight / 2);
 		mGui = new GUImanager();
 		mHud = new HUDmanager(this);
 
-		
-		// TODO Auto-generated constructor stub
+	
 	}
 
-	public void init() {
+	public void init(World world) {
+		this.mWorld = world;
+		
+		
+		System.out.println(mWorld.getWorldName() + "");
+		
 		
 		mRender = new Rectangle(((int)pos.mXPosition), (int)pos.mYPosition, mRenderDistanceWidth * 32, mRenderDistanceHeight * 32);
 
@@ -102,75 +114,101 @@ public class Player implements KeyListener {
 
 		// DOWN
 		ani_down = new Animator(mAnimationDown);
-		ani_down.setSpeed(140);
+		ani_down.setSpeed(mAnimationSpeed);
 		ani_down.play();
 
 		// UP
 		ani_up = new Animator(mAnimationUp);
-		ani_up.setSpeed(140);// in miliseconds
+		ani_up.setSpeed(mAnimationSpeed);// in miliseconds
 		ani_up.play();
 
 		// LEFT
 		ani_left = new Animator(mAnimationLeft);
-		ani_left.setSpeed(140);
+		ani_left.setSpeed(mAnimationSpeed);
 		ani_left.play();
 
 		// RIGHT
 		ani_right = new Animator(mAnimationRight);
-		ani_right.setSpeed(140);
+		ani_right.setSpeed(mAnimationSpeed);
 		ani_right.play();
 
 		// IDLE
 		ani_idle = new Animator(mAnimationIdle);
-		ani_idle.setSpeed(140);
+		ani_idle.setSpeed(mAnimationSpeed);
 		ani_idle.play();
-
+		
 	}
 
 	public void tick(double deltaTime) {
 		
+		mPlayerMM.tick();
+		
 		mRender = new Rectangle(
-				(int) (pos.mXPosition - pos.getWorldLocation().mXPosition + pos.mXPosition - mRenderDistanceWidth * 32 / 2 + width / 2),
-				(int) (pos.mYPosition - pos.getWorldLocation().mYPosition + pos.mYPosition - mRenderDistanceHeight* 32 / 2 + height / 2),
+				(int) (pos.mXPosition - pos.getWorldLocation().mXPosition + pos.mXPosition - mRenderDistanceWidth * 32 / 2 + mWidth / 2),
+				(int) (pos.mYPosition - pos.getWorldLocation().mYPosition + pos.mYPosition - mRenderDistanceHeight* 32 / 2 + mHeight / 2),
 				mRenderDistanceWidth * 32,
 				mRenderDistanceHeight * 32);
 		
-		float moveAmountUP = (float) (speedUP * fixDT);
-		float moveAmountDOWN = (float) (speedDOWN * fixDT);
-		float moveAmountLEFT = (float) (speedLEFT * fixDT);
-		float moveAmountRIGHT = (float) (speedRIGHT * fixDT);
+		float moveAmountUP = (float) (mStartSpeedUp * mFixDeltaTime);
+		float moveAmountDOWN = (float) (mStartSpeedDown * mFixDeltaTime);
+		float moveAmountLEFT = (float) (mStartSpeedLeft * mFixDeltaTime);
+		float moveAmountRIGHT = (float) (mStartSpeedRight * mFixDeltaTime);
 
-		if (up) {
+		if (mMovingUp) {
 			moveMapUp(moveAmountUP);
 			animationState = 0;
 		} else {
 			moveMapUpGlide(moveAmountUP);
 		}
-		if (down) {
+		if (mMovingDown) {
 			moveMapDown(moveAmountDOWN);
 			animationState = 1;
 		} else {
 			moveMapDownGlide(moveAmountDOWN);
 		}
-		if (left) {
+		if (mMovingLeft) {
 			moveMapLeft(moveAmountLEFT);
 			animationState = 2;
 		} else {
 			moveMapLeftGlide(moveAmountLEFT);
 		}
-		if (right) {
+		if (mMovingRight) {
 			moveMapRight(moveAmountRIGHT);
 			animationState = 3;
 		} else {
 			moveMapRightGlide(moveAmountRIGHT);
 		}
 
-		if (!up && !down && !right && !left) {
+		if (!mMovingUp && !mMovingDown && !mMovingRight && !mMovingLeft) {
 			/*
 			 * standing still
 			 * 
 			 */
 			animationState = 4;
+		}
+		
+		if(mIsRunning){
+			if(mAnimationSpeed != 120){
+				mAnimationSpeed = 120;
+				ani_down.setSpeed(mAnimationSpeed);
+				ani_up.setSpeed(mAnimationSpeed);
+				ani_left.setSpeed(mAnimationSpeed);
+				ani_right.setSpeed(mAnimationSpeed);
+				ani_idle.setSpeed(mAnimationSpeed);
+				mCurrentMoveSpeed += RUN_SPEED;
+				
+			}
+		}else{
+			if(mAnimationSpeed != 180){
+				mAnimationSpeed = 180;
+				ani_down.setSpeed(mAnimationSpeed);
+				ani_up.setSpeed(mAnimationSpeed);
+				ani_left.setSpeed(mAnimationSpeed);
+				ani_right.setSpeed(mAnimationSpeed);
+				ani_idle.setSpeed(mAnimationSpeed);
+				mCurrentMoveSpeed -= RUN_SPEED;
+				
+			}
 		}
 	}
 
@@ -320,18 +358,18 @@ public class Player implements KeyListener {
 				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition),
 						(int) (pos.mYPosition + GameLoop.map.mYPosition - speed)),
 
-				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + width),
+				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + mWidth),
 						(int) (pos.mYPosition + GameLoop.map.mYPosition - speed)))) {
 
-			if (speedUP < maxSpeed) {
-				speedUP += SLOWDOWN;
+			if (mStartSpeedUp < mCurrentMoveSpeed) {
+				mStartSpeedUp += SLOWDOWN;
 			} else {
-				speedUP = maxSpeed;
+				mStartSpeedUp = mCurrentMoveSpeed;
 			}
 
 			GameLoop.map.mYPosition -= speed;
 		} else {
-			speedUP = 0;
+			mStartSpeedUp = 0;
 		}
 	}
 
@@ -341,21 +379,21 @@ public class Player implements KeyListener {
 				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition),
 						(int) (pos.mYPosition + GameLoop.map.mYPosition - speed)),
 
-				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + width),
+				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + mWidth),
 						(int) (pos.mYPosition + GameLoop.map.mYPosition - speed)))) {
 
-			if (speedUP != 0) {
-				speedUP -= SLOWDOWN;
+			if (mStartSpeedUp != 0) {
+				mStartSpeedUp -= SLOWDOWN;
 
-				if (speedUP < 0) {
-					speedUP = 0;
+				if (mStartSpeedUp < 0) {
+					mStartSpeedUp = 0;
 				}
 			}
 
 			GameLoop.map.mYPosition -= speed;
 
 		} else {
-			speedUP = 0;
+			mStartSpeedUp = 0;
 		}
 	}
 
@@ -363,20 +401,20 @@ public class Player implements KeyListener {
 		if (!Check.CollisionPlayerBlock(
 
 				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition),
-						(int) (pos.mYPosition + GameLoop.map.mYPosition + height + speed)),
+						(int) (pos.mYPosition + GameLoop.map.mYPosition + mHeight + speed)),
 
-				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + width),
-						(int) (pos.mYPosition + GameLoop.map.mYPosition + height + speed)))) {
+				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + mWidth),
+						(int) (pos.mYPosition + GameLoop.map.mYPosition + mHeight + speed)))) {
 
-			if (speedDOWN < maxSpeed) {
-				speedDOWN += SLOWDOWN;
+			if (mStartSpeedDown < mCurrentMoveSpeed) {
+				mStartSpeedDown += SLOWDOWN;
 			} else {
-				speedDOWN = maxSpeed;
+				mStartSpeedDown = mCurrentMoveSpeed;
 			}
 
 			GameLoop.map.mYPosition += speed;
 		} else {
-			speedDOWN = 0;
+			mStartSpeedDown = 0;
 		}
 	}
 
@@ -384,162 +422,163 @@ public class Player implements KeyListener {
 		if (!Check.CollisionPlayerBlock(
 
 				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition),
-						(int) (pos.mYPosition + GameLoop.map.mYPosition + height + speed)),
+						(int) (pos.mYPosition + GameLoop.map.mYPosition + mHeight + speed)),
 
-				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + width),
-						(int) (pos.mYPosition + GameLoop.map.mYPosition + height + speed)))) {
+				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + mWidth),
+						(int) (pos.mYPosition + GameLoop.map.mYPosition + mHeight + speed)))) {
 
-			if (speedDOWN != 0) {
-				speedDOWN -= SLOWDOWN;
+			if (mStartSpeedDown != 0) {
+				mStartSpeedDown -= SLOWDOWN;
 
-				if (speedDOWN < 0) {
-					speedDOWN = 0;
+				if (mStartSpeedDown < 0) {
+					mStartSpeedDown = 0;
 				}
 			}
 
 			GameLoop.map.mYPosition += speed;
 
 		} else {
-			speedDOWN = 0;
+			mStartSpeedDown = 0;
 		}
 	}
 
 	public void moveMapLeft(float speed) {
 		if (!Check.CollisionPlayerBlock(new Point((int) (pos.mXPosition + GameLoop.map.mXPosition - speed),
-				(int) (pos.mYPosition + GameLoop.map.mYPosition + height)),
+				(int) (pos.mYPosition + GameLoop.map.mYPosition + mHeight)),
 
 				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition - speed),
 						(int) (pos.mYPosition + GameLoop.map.mYPosition)))) {
 
-			if (speedLEFT < maxSpeed) {
-				speedLEFT += SLOWDOWN;
+			if (mStartSpeedLeft < mCurrentMoveSpeed) {
+				mStartSpeedLeft += SLOWDOWN;
 			} else {
-				speedLEFT = maxSpeed;
+				mStartSpeedLeft = mCurrentMoveSpeed;
 			}
 
 			GameLoop.map.mXPosition -= speed;
 
 		} else {
-			speedLEFT = 0;
+			mStartSpeedLeft = 0;
 		}
 	}
 
 	public void moveMapLeftGlide(float speed) {
 		if (!Check.CollisionPlayerBlock(new Point((int) (pos.mXPosition + GameLoop.map.mXPosition - speed),
-				(int) (pos.mYPosition + GameLoop.map.mYPosition + height)),
+				(int) (pos.mYPosition + GameLoop.map.mYPosition + mHeight)),
 
 				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition - speed),
 						(int) (pos.mYPosition + GameLoop.map.mYPosition)))) {
 
-			if (speedLEFT != 0) {
-				speedLEFT -= SLOWDOWN;
+			if (mStartSpeedLeft != 0) {
+				mStartSpeedLeft -= SLOWDOWN;
 
-				if (speedLEFT < 0) {
-					speedLEFT = 0;
+				if (mStartSpeedLeft < 0) {
+					mStartSpeedLeft = 0;
 				}
 			}
 
 			GameLoop.map.mXPosition -= speed;
 
 		} else {
-			speedLEFT = 0;
+			mStartSpeedLeft = 0;
 		}
 
 	}
 
 	public void moveMapRight(float speed) {
-		if (!Check.CollisionPlayerBlock(new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + width + speed),
+		if (!Check.CollisionPlayerBlock(new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + mWidth + speed),
 				(int) (pos.mYPosition + GameLoop.map.mYPosition)),
 
-				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + width + speed),
-						(int) (pos.mYPosition + GameLoop.map.mYPosition + height)))) {
+				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + mWidth + speed),
+						(int) (pos.mYPosition + GameLoop.map.mYPosition + mHeight)))) {
 
-			if (speedRIGHT < maxSpeed) {
-				speedRIGHT += SLOWDOWN;
+			if (mStartSpeedRight < mCurrentMoveSpeed) {
+				mStartSpeedRight += SLOWDOWN;
 			} else {
-				speedRIGHT = maxSpeed;
+				mStartSpeedRight = mCurrentMoveSpeed;
 			}
 
 			GameLoop.map.mXPosition += speed;
 		} else {
-			speedRIGHT = 0;
+			mStartSpeedRight = 0;
 		}
 	}
 
 	public void moveMapRightGlide(float speed) {
-		if (!Check.CollisionPlayerBlock(new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + width + speed),
+		if (!Check.CollisionPlayerBlock(new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + mWidth + speed),
 				(int) (pos.mYPosition + GameLoop.map.mYPosition)),
 
-				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + width + speed),
-						(int) (pos.mYPosition + GameLoop.map.mYPosition + height)))) {
+				new Point((int) (pos.mXPosition + GameLoop.map.mXPosition + mWidth + speed),
+						(int) (pos.mYPosition + GameLoop.map.mYPosition + mHeight)))) {
 
-			if (speedRIGHT != 0) {
-				speedRIGHT -= SLOWDOWN;
+			if (mStartSpeedRight != 0) {
+				mStartSpeedRight -= SLOWDOWN;
 
-				if (speedRIGHT < 0) {
-					speedRIGHT = 0;
+				if (mStartSpeedRight < 0) {
+					mStartSpeedRight = 0;
 				}
 			}
 
 			GameLoop.map.mXPosition += speed;
 
 		} else {
-			speedRIGHT = 0;
+			mStartSpeedRight = 0;
 		}
 	}
 
 	public void render(Graphics2D g) {
 		g.setColor(mColorTranslucent);
-		g.fillRect((int) pos.mXPosition, (int) pos.mYPosition, width, height);
+		g.fillRect((int) pos.mXPosition, (int) pos.mYPosition, mWidth, mHeight);
 
 		
 
 		if (animationState == 0) {
 			// UP
-			g.drawImage(ani_up.mSprite, (int) pos.mXPosition - width / 2, (int) pos.mYPosition - height, width * mScale, height * mScale,
+			g.drawImage(ani_up.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight, mWidth * mScale, mHeight * mScale,
 					null);
-			if (up) {
+			if (mMovingUp) {
 				ani_up.update(System.currentTimeMillis());
 			}
 		}
 		if (animationState == 1) {
 			// DOWN
-			g.drawImage(ani_down.mSprite, (int) pos.mXPosition - width / 2, (int) pos.mYPosition - height, width * mScale, height * mScale,
+			g.drawImage(ani_down.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight, mWidth * mScale, mHeight * mScale,
 					null);
-			if (down) {
+			if (mMovingDown) {
 				ani_down.update(System.currentTimeMillis());
 			}
 		}
 		if (animationState == 2) {
 			// LEFT
-			g.drawImage(ani_left.mSprite, (int) pos.mXPosition - width / 2, (int) pos.mYPosition - height, width * mScale, height * mScale,
+			g.drawImage(ani_left.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight, mWidth * mScale, mHeight * mScale,
 					null);
-			if (left) {
+			if (mMovingLeft) {
 				ani_left.update(System.currentTimeMillis());
 			}
 		}
 		if (animationState == 3) {
 			// RIGHT
-			g.drawImage(ani_right.mSprite, (int) pos.mXPosition - width / 2, (int) pos.mYPosition - height, width * mScale, height * mScale,
+			g.drawImage(ani_right.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight, mWidth * mScale, mHeight * mScale,
 					null);
-			if (right) {
+			if (mMovingRight) {
 				ani_right.update(System.currentTimeMillis());
 			}
 
 		}
 		if (animationState == 4) {
 			// IDLE
-			g.drawImage(ani_idle.mSprite, (int) pos.mXPosition - width / 2, (int) pos.mYPosition - height, width * mScale, height * mScale,
+			g.drawImage(ani_idle.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight, mWidth * mScale, mHeight * mScale,
 					null);
 			
 			ani_idle.update(System.currentTimeMillis());
 			
 		}
 		
-		g.drawRect((int)pos.mXPosition - mRenderDistanceWidth * 32 /2 + width / 2, (int)pos.mYPosition - mRenderDistanceHeight * 32 / 2 + height / 2, mRenderDistanceWidth * 32, mRenderDistanceHeight * 32);
+		g.drawRect((int)pos.mXPosition - mRenderDistanceWidth * 32 /2 + mWidth / 2, (int)pos.mYPosition - mRenderDistanceHeight * 32 / 2 + mHeight / 2, mRenderDistanceWidth * 32, mRenderDistanceHeight * 32);
 		
 		mHud.render(g);
 		mGui.render(g);
+		mPlayerMM.render(g);
 		
 	}
 
@@ -548,16 +587,28 @@ public class Player implements KeyListener {
 		int key = e.getKeyCode();
 
 		if (key == KeyEvent.VK_W) {
-			up = true;
+			mMovingUp = true;
 		}
 		if (key == KeyEvent.VK_S) {
-			down = true;
+			mMovingDown = true;
 		}
 		if (key == KeyEvent.VK_A) {
-			left = true;
+			mMovingLeft = true;
 		}
 		if (key == KeyEvent.VK_D) {
-			right = true;
+			mMovingRight = true;
+		}
+		
+		//Sprint
+		if(key == KeyEvent.VK_SHIFT){
+			mIsRunning = true;
+			
+		}
+		
+		
+		//Exit game
+		if (key == KeyEvent.VK_ESCAPE) {
+			System.exit(1);
 		}
 
 	}
@@ -567,16 +618,20 @@ public class Player implements KeyListener {
 		int key = e.getKeyCode();
 
 		if (key == KeyEvent.VK_W) {
-			up = false;
+			mMovingUp = false;
 		}
 		if (key == KeyEvent.VK_S) {
-			down = false;
+			mMovingDown = false;
 		}
 		if (key == KeyEvent.VK_A) {
-			left = false;
+			mMovingLeft = false;
 		}
 		if (key == KeyEvent.VK_D) {
-			right = false;
+			mMovingRight = false;
+		}
+		if(key == KeyEvent.VK_SHIFT){
+			mIsRunning = false;
+
 		}
 
 	}
@@ -598,7 +653,7 @@ public class Player implements KeyListener {
 	}
 	
 	public float getMaxSpeed() {
-		return maxSpeed;
+		return mCurrentMoveSpeed;
 	}
 	
 	public float getSLOWDOWN() {

@@ -1,25 +1,23 @@
 package me.tdl.managers;
 
-import java.awt.AlphaComposite;
+//import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-
-import javax.swing.JLabel;
+//import java.awt.image.BufferedImage;
+//import java.util.ArrayList;
 
 import me.tdl.MoveableObjects.Player;
 import me.tdl.main.Main;
 import my.project.gop.main.IDGameLoop;
-import my.project.gop.main.Light;
-import my.project.gop.main.Vector2F;
-import my.project.gop.main.loadImageFrom;
+//import my.project.gop.main.Light;
+//import my.project.gop.main.Vector2F;
+//import my.project.gop.main.loadImageFrom;
 
 public class HUDmanager {
 	
-	private Color mColorTranslucent;
+	//private Color mColorTranslucent;
 	
-	private BufferedImage mLightMap = new BufferedImage(100*32, 100*32, BufferedImage.TYPE_INT_ARGB);
+//	private BufferedImage mLightMap = new BufferedImage(100*32, 100*32, BufferedImage.TYPE_INT_ARGB);
 //	private ArrayList<Light> mLights = new ArrayList<Light>();
 //	private Vector2F mLightVector = new Vector2F();
 	

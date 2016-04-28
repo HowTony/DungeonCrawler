@@ -15,6 +15,7 @@ public class Block extends Rectangle {
 	private BufferedImage mBlock;
 	private boolean isSolid;
 	private boolean isAlive;
+	private boolean mDropped = false;
 
 	public Block(Vector2F pos, BlockType someBlock) {
 		setBounds((int) pos.mXPosition, (int) pos.mYPosition, BLOCK_SIZE, BLOCK_SIZE);
@@ -58,6 +59,16 @@ public class Block extends Rectangle {
 			if (isSolid) {
 				g.drawRect((int) mPostion.getWorldLocation().mXPosition, (int) mPostion.getWorldLocation().mYPosition,
 						BLOCK_SIZE, BLOCK_SIZE);
+			}else{
+				if(!mDropped){
+					float xPos = mPostion.mXPosition + 24 - 12;
+					float yPos = mPostion.mYPosition + 24 - 12;
+					
+					Vector2F newPos = new Vector2F(xPos, yPos);
+					World.dropBlockEntity(newPos, mBlock);
+					
+					mDropped = true;
+				}
 			}
 		}
 	}
