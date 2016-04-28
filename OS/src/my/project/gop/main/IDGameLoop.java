@@ -1,5 +1,7 @@
 package my.project.gop.main;
 
+
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -15,8 +17,9 @@ public class IDGameLoop extends JPanel implements Runnable {
 	private static final long serialVersionUID = 1L;
 	private Thread mThread;
 	private boolean mRunning;
-
-	private int mFramesPerSecond; // frames per second
+	
+	public static double mFPS = 0.0;
+	public static int mFramesPerSecond; // frames per second
 	private int mTicksPerSecond; // ticks per second
 
 	private int mWidth;
@@ -86,7 +89,8 @@ public class IDGameLoop extends JPanel implements Runnable {
 			if (System.currentTimeMillis() - lastTimer >= 1000) {
 				lastTimer += 1000;
 				mTicksPerSecond = frames;
-				mFramesPerSecond = ticks;
+				mFramesPerSecond = ticks; 
+				mFPS = mTicksPerSecond;
 				frames = 0;
 				ticks = 0;
 
@@ -118,5 +122,6 @@ public class IDGameLoop extends JPanel implements Runnable {
 		}
 		g2.dispose();
 	}
+	
 
 }

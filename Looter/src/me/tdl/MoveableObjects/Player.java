@@ -13,6 +13,8 @@ import me.tdl.main.Animator;
 import me.tdl.main.Assets;
 import me.tdl.main.Check;
 import me.tdl.main.Main;
+import me.tdl.managers.GUImanager;
+import me.tdl.managers.HUDmanager;
 import my.project.gop.main.Vector2F;
 
 public class Player implements KeyListener {
@@ -21,6 +23,8 @@ public class Player implements KeyListener {
 	private int width = 32;
 	private int height = 32;
 	private int mScale = 2;
+	
+	Color mColorTranslucent = new Color(0, 0, 0, 0);
 
 	private static boolean up, down, left, right;
 	private float maxSpeed = 3 * 32F;
@@ -32,7 +36,9 @@ public class Player implements KeyListener {
 	private float speedDOWN = 0;
 	private float speedLEFT = 0;
 	private float speedRIGHT = 0;
-
+	
+	private HUDmanager mHud;
+	private GUImanager mGui;
 	
 	
 	//rendering
@@ -42,19 +48,14 @@ public class Player implements KeyListener {
 	
 	
 	private int animationState = 0;
-	
 	private ArrayList<BufferedImage> mAnimationUp;
 	Animator ani_up;
-
 	private ArrayList<BufferedImage> mAnimationDown;
 	Animator ani_down;
-
 	private ArrayList<BufferedImage> mAnimationLeft;
 	Animator ani_left;
-
 	private ArrayList<BufferedImage> mAnimationRight;
 	Animator ani_right;
-
 	private ArrayList<BufferedImage> mAnimationIdle;
 	Animator ani_idle;
 	
@@ -63,8 +64,11 @@ public class Player implements KeyListener {
 		/*
 		 * set pos to put player in the middle of screen.
 		 */
-
 		pos = new Vector2F(Main.mWidth / 2 - width / 2, Main.mHeight / 2 - height / 2);
+		mGui = new GUImanager();
+		mHud = new HUDmanager(this);
+
+		
 		// TODO Auto-generated constructor stub
 	}
 
@@ -98,27 +102,27 @@ public class Player implements KeyListener {
 
 		// DOWN
 		ani_down = new Animator(mAnimationDown);
-		ani_down.setSpeed(180);
+		ani_down.setSpeed(140);
 		ani_down.play();
 
 		// UP
 		ani_up = new Animator(mAnimationUp);
-		ani_up.setSpeed(180);// in miliseconds
+		ani_up.setSpeed(140);// in miliseconds
 		ani_up.play();
 
 		// LEFT
 		ani_left = new Animator(mAnimationLeft);
-		ani_left.setSpeed(180);
+		ani_left.setSpeed(140);
 		ani_left.play();
 
 		// RIGHT
 		ani_right = new Animator(mAnimationRight);
-		ani_right.setSpeed(180);
+		ani_right.setSpeed(140);
 		ani_right.play();
 
 		// IDLE
 		ani_idle = new Animator(mAnimationIdle);
-		ani_idle.setSpeed(180);
+		ani_idle.setSpeed(140);
 		ani_idle.play();
 
 	}
@@ -485,14 +489,10 @@ public class Player implements KeyListener {
 	}
 
 	public void render(Graphics2D g) {
+		g.setColor(mColorTranslucent);
 		g.fillRect((int) pos.mXPosition, (int) pos.mYPosition, width, height);
 
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, Main.mWidth, Main.mHeight / 6);
-		g.fillRect(0, 1000, Main.mWidth, Main.mHeight / 6);
-		g.setColor(Color.WHITE);
-
-		g.clipRect(0, 0, Main.mWidth, Main.mHeight);
+		
 
 		if (animationState == 0) {
 			// UP
@@ -537,7 +537,10 @@ public class Player implements KeyListener {
 		}
 		
 		g.drawRect((int)pos.mXPosition - mRenderDistanceWidth * 32 /2 + width / 2, (int)pos.mYPosition - mRenderDistanceHeight * 32 / 2 + height / 2, mRenderDistanceWidth * 32, mRenderDistanceHeight * 32);
-
+		
+		mHud.render(g);
+		mGui.render(g);
+		
 	}
 
 	@Override
@@ -583,5 +586,25 @@ public class Player implements KeyListener {
 		// TODO Auto-generated method stub
 
 	}
-
+	
+	
+	
+	////////////////////////////////////
+	///////////////////////////////////
+	
+	
+	public Vector2F getPos() {
+		return pos;
+	}
+	
+	public float getMaxSpeed() {
+		return maxSpeed;
+	}
+	
+	public float getSLOWDOWN() {
+		return SLOWDOWN;
+	}
+	
+	
+	
 }

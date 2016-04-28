@@ -8,9 +8,7 @@ import javax.imageio.ImageIO;
 
 public class loadImageFrom {
 
-	
-	
-	
+
 	public static BufferedImage LoadImageFrom(Class<?> classfile, String path) {
 		URL url = classfile.getResource(path);
 		BufferedImage img = null;
