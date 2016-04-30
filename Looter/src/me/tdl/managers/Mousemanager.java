@@ -13,77 +13,69 @@ import me.tdl.main.Assets;
 public class Mousemanager implements MouseListener, MouseMotionListener, MouseWheelListener {
 
 	private static int mMouseMovedX, mMouseMovedY;
-	private Point mMouse;
-	
-	private static boolean mPressed;
-	
-	
-	public void tick(){
+	public static Point mMouse;
+
+	public static boolean s_Pressed;
+
+	public void tick() {
 		mMouse = new Point(mMouseMovedX, mMouseMovedY);
 	}
-	
-	public void render(Graphics2D g){
+
+	public void render(Graphics2D g) {
 		g.fillRect(mMouseMovedX, mMouseMovedY, 4, 4);
-		
-		if(mPressed){
+
+		if (s_Pressed) {
 			g.drawImage(Assets.getMouse_2(), mMouseMovedX, mMouseMovedY, 32, 32, null);
-		}else{
+		} else {
 			g.drawImage(Assets.getMouse_1(), mMouseMovedX, mMouseMovedY, 32, 32, null);
 		}
 	}
-	
-	
+
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
-		
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		
-		
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		
-		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if(e.getButton() ==  MouseEvent.BUTTON1){
-			mPressed = true;
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			s_Pressed = true;
 		}
-		
+
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if(e.getButton() == MouseEvent.BUTTON1){
-			mPressed = false;
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			s_Pressed = false;
 		}
-		
+
 	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		
-		
+
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		
-		
+		mMouseMovedX = e.getX();
+		mMouseMovedY = e.getY();
+
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		mMouseMovedX = e.getX();
 		mMouseMovedY = e.getY();
-		
+
 	}
 
 }

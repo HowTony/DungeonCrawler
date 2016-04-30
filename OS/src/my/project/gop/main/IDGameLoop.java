@@ -19,7 +19,7 @@ public class IDGameLoop extends JPanel implements Runnable {
 	private boolean mRunning;
 	
 	public static double mFPS = 0.0;
-	public static int mFramesPerSecond; // frames per second
+	private int mFramesPerSecond; // frames per second
 	private int mTicksPerSecond; // ticks per second
 
 	private int mWidth;
@@ -99,7 +99,6 @@ public class IDGameLoop extends JPanel implements Runnable {
 	}
 
 	public void init() {
-		// TODO Auto-generated method stub
 		mImage = new BufferedImage(mWidth, mHeight, BufferedImage.TYPE_INT_RGB); // draw everything inside the bufferedImage
 		mGraphics2D = (Graphics2D) mImage.getGraphics();
 		mRunning = true;

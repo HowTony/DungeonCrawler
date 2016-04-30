@@ -18,7 +18,7 @@ public class TileManager {
 			// we can move the blocks to the right
 			//eachBlock.mPostion.add(new Vector2F(1, 0));
 			
-			if(Player.mRender.intersects(eachBlock.getBounds())){
+			if(Player.s_Render.intersects(eachBlock.getBounds())){
 				eachBlock.setAlive(true);
 			}else{
 				eachBlock.setAlive(false);

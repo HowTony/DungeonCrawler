@@ -9,6 +9,7 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import me.tdl.gameloop.GameLoop;
+import me.tdl.gamestate.GameStateButton;
 import me.tdl.generator.World;
 import me.tdl.main.Animator;
 import me.tdl.main.Assets;
@@ -32,7 +33,7 @@ public class Player implements KeyListener {
 	private static boolean mMovingUp, mMovingDown, mMovingLeft, mMovingRight, mIsRunning;
 	
 	private final float RUN_SPEED = 48;
-	private float mCurrentMoveSpeed = 3 * 32F;
+	private float mCurrentMoveSpeed = 4 * 32F;
 	private float mFixDeltaTime = 1.5F / 60F;
 	private final float SLOWDOWN = 3F;
 	
@@ -43,7 +44,7 @@ public class Player implements KeyListener {
 	private float mStartSpeedLeft = 0;
 	private float mStartSpeedRight = 0;
 	
-	private long mAnimationSpeed = 140;
+	private long mAnimationSpeed = 120;
 	
 	private HUDmanager mHud;
 	private GUImanager mGui;
@@ -52,8 +53,10 @@ public class Player implements KeyListener {
 	//rendering
 	private int mRenderDistanceWidth = 64;
 	private int mRenderDistanceHeight = 28;
-	public static Rectangle mRender;
+	public static Rectangle s_Render;
 	
+	
+	//Button
 	
 	private int animationState = 0;
 	private ArrayList<BufferedImage> mAnimationUp;
@@ -73,20 +76,21 @@ public class Player implements KeyListener {
 		 * set pos to put player in the middle of screen.
 		 */
 		pos = new Vector2F(Main.mWidth / 2 - mWidth / 2, Main.mHeight / 2 - mHeight / 2);
-		mGui = new GUImanager();
-		mHud = new HUDmanager(this);
+	
 
 	
 	}
 
 	public void init(World world) {
+		mGui = new GUImanager();
+		mHud = new HUDmanager(this);
 		this.mWorld = world;
 		
 		
 		System.out.println(mWorld.getWorldName() + "");
 		
 		
-		mRender = new Rectangle(((int)pos.mXPosition), (int)pos.mYPosition, mRenderDistanceWidth * 32, mRenderDistanceHeight * 32);
+		s_Render = new Rectangle(((int)pos.mXPosition), (int)pos.mYPosition, mRenderDistanceWidth * 32, mRenderDistanceHeight * 32);
 
 		mAnimationDown = new ArrayList<BufferedImage>();
 		mAnimationUp = new ArrayList<BufferedImage>();
@@ -143,7 +147,7 @@ public class Player implements KeyListener {
 		
 		mPlayerMM.tick();
 		
-		mRender = new Rectangle(
+		s_Render = new Rectangle(
 				(int) (pos.mXPosition - pos.getWorldLocation().mXPosition + pos.mXPosition - mRenderDistanceWidth * 32 / 2 + mWidth / 2),
 				(int) (pos.mYPosition - pos.getWorldLocation().mYPosition + pos.mYPosition - mRenderDistanceHeight* 32 / 2 + mHeight / 2),
 				mRenderDistanceWidth * 32,
@@ -372,7 +376,8 @@ public class Player implements KeyListener {
 			mStartSpeedUp = 0;
 		}
 	}
-
+	
+	
 	public void moveMapUpGlide(float speed) {
 		if (!Check.CollisionPlayerBlock(
 
@@ -579,6 +584,9 @@ public class Player implements KeyListener {
 		mHud.render(g);
 		mGui.render(g);
 		mPlayerMM.render(g);
+
+		
+		
 		
 	}
 

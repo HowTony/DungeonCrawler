@@ -20,7 +20,7 @@ public class Block extends Rectangle {
 	public Block(Vector2F pos, BlockType someBlock) {
 		setBounds((int) pos.mXPosition, (int) pos.mYPosition, BLOCK_SIZE, BLOCK_SIZE);
 		this.mPostion = pos;
-		isAlive = true;
+		isAlive = false;
 		this.mBlockType = someBlock;
 		init();
 	}
@@ -65,7 +65,7 @@ public class Block extends Rectangle {
 					float yPos = mPostion.mYPosition + 24 - 12;
 					
 					Vector2F newPos = new Vector2F(xPos, yPos);
-					World.dropBlockEntity(newPos, mBlock);
+					
 					
 					mDropped = true;
 				}

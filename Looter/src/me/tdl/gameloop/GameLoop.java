@@ -11,20 +11,19 @@ public class GameLoop extends IDGameLoop {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	GameStateManager gsm;
-	public static Assets mAssets = new Assets();
+	private GameStateManager gsm;
+	public static Assets s_Assets = new Assets();
 	public static Vector2F map = new Vector2F();
 	
 
 	public GameLoop(int fwidth, int fheight) {
 		super(fwidth, fheight);
-		// TODO Auto-generated constructor stub
 	}
 	
 	
 	@Override
 	public void init() {
-		mAssets.init();  //makes sure all textures are loaded before rendering them.
+		s_Assets.init();  //makes sure all textures are loaded before rendering them.
 		Vector2F.setWorldVariables(map.mXPosition, map.mYPosition);
 		gsm = new GameStateManager();
 		gsm.init();
