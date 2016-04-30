@@ -5,13 +5,14 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 //import java.awt.image.BufferedImage;
 //import java.util.ArrayList;
+import java.awt.image.BufferedImage;
 
 import me.tdl.MoveableObjects.Player;
 import me.tdl.main.Main;
 import my.project.gop.main.IDGameLoop;
 //import my.project.gop.main.Light;
 //import my.project.gop.main.Vector2F;
-//import my.project.gop.main.loadImageFrom;
+import my.project.gop.main.loadImageFrom;
 
 public class HUDmanager {
 	
@@ -21,14 +22,14 @@ public class HUDmanager {
 //	private ArrayList<Light> mLights = new ArrayList<Light>();
 //	private Vector2F mLightVector = new Vector2F();
 	
-	//private BufferedImage mLight;
+	private BufferedImage mLight;
 	private Player mPlayer;
 
 	
 	
 	public HUDmanager(Player player) {
 		this.mPlayer = player;
-		//mLight = loadImageFrom.LoadImageFrom(Main.class, "Light.png");
+		mLight = loadImageFrom.LoadImageFrom(Main.class, "Light.png");
 	
 		
 //		addLights();
@@ -69,7 +70,7 @@ public class HUDmanager {
 		g.fillRect(0, 1000, Main.mWidth, Main.mHeight / 6);
 		
 		g.clipRect(0, 0, Main.mWidth, Main.mHeight);
-		//g.drawImage(mLight, 0, 0, Main.mWidth, Main.mHeight, null);
+		g.drawImage(mLight, 0, 0, Main.mWidth, Main.mHeight, null);
 	
 	
 		g.setColor(Color.WHITE);

@@ -13,7 +13,7 @@ public class GameLoop extends IDGameLoop {
 	private static final long serialVersionUID = 1L;
 	private GameStateManager gsm;
 	public static Assets s_Assets = new Assets();
-	public static Vector2F map = new Vector2F();
+
 	
 
 	public GameLoop(int fwidth, int fheight) {
@@ -24,7 +24,7 @@ public class GameLoop extends IDGameLoop {
 	@Override
 	public void init() {
 		s_Assets.init();  //makes sure all textures are loaded before rendering them.
-		Vector2F.setWorldVariables(map.mXPosition, map.mYPosition);
+		
 		gsm = new GameStateManager();
 		gsm.init();
 		super.init();
@@ -32,7 +32,7 @@ public class GameLoop extends IDGameLoop {
 	
 	@Override
 	public void tick(double deltaTime) {
-		Vector2F.setWorldVariables(map.mXPosition, map.mYPosition);
+		
 		gsm.tick(deltaTime);
 	}
 	
