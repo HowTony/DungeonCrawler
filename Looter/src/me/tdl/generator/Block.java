@@ -17,10 +17,16 @@ public class Block extends Rectangle {
 	private boolean isAlive;
 	private boolean mDropped = false;
 
+	public Block(Vector2F pos) {
+		setBounds((int) pos.mXPosition, (int) pos.mYPosition, BLOCK_SIZE, BLOCK_SIZE);
+		this.mPostion = pos;
+		isAlive = true;
+	}
+
 	public Block(Vector2F pos, BlockType someBlock) {
 		setBounds((int) pos.mXPosition, (int) pos.mYPosition, BLOCK_SIZE, BLOCK_SIZE);
 		this.mPostion = pos;
-		isAlive = false;
+		isAlive = true;
 		this.mBlockType = someBlock;
 		init();
 	}
@@ -39,7 +45,7 @@ public class Block extends Rectangle {
 		case WALL_1:
 			mBlock = Assets.getWall_1();
 			break;
-			
+
 		case LARGE_STONE_FLOOR:
 			mBlock = Assets.getStoneFloorLarge();
 			break;
@@ -54,23 +60,37 @@ public class Block extends Rectangle {
 
 	public void render(Graphics2D g) {
 		if (isAlive) {
-			g.drawImage(mBlock, (int) mPostion.getWorldLocation().mXPosition,
-					(int) mPostion.getWorldLocation().mYPosition, BLOCK_SIZE, BLOCK_SIZE, null);
-			if (isSolid) {
-				g.drawRect((int) mPostion.getWorldLocation().mXPosition, (int) mPostion.getWorldLocation().mYPosition,
+
+			if (mBlock != null) {
+
+				g.drawImage(mBlock, (int) mPostion.getWorldLocation().mXPosition,
+						(int) mPostion.getWorldLocation().mYPosition, BLOCK_SIZE, BLOCK_SIZE, null);
+
+			} else {
+				g.fillRect((int) mPostion.getWorldLocation().mXPosition, (int) mPostion.getWorldLocation().mYPosition,
 						BLOCK_SIZE, BLOCK_SIZE);
-			}else{
-				if(!mDropped){
-					float xPos = mPostion.mXPosition + 24 - 12;
-					float yPos = mPostion.mYPosition + 24 - 12;
-					
-					Vector2F newPos = new Vector2F(xPos, yPos);
-					
-					
-					mDropped = true;
+
+				if (isSolid) {
+					g.drawRect((int) mPostion.getWorldLocation().mXPosition,
+							(int) mPostion.getWorldLocation().mYPosition, BLOCK_SIZE, BLOCK_SIZE);
+				} else {
+					if (!mDropped) {
+						float xPos = mPostion.mXPosition + 24 - 12;
+						float yPos = mPostion.mYPosition + 24 - 12;
+
+						Vector2F newPos = new Vector2F(xPos, yPos);
+
+						mDropped = true;
+
+					}
 				}
 			}
 		}
+	}
+	
+	
+	public Vector2F getBlockLocation(){
+		return mPostion;
 	}
 
 	public enum BlockType {

@@ -2,26 +2,46 @@ package me.tdl.generator;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import me.tdl.MoveableObjects.Player;
 
 public class TileManager {
 
-	public static ArrayList<Block> mBlocks = new ArrayList<Block>();
+	public static CopyOnWriteArrayList<Block> mBlocks = new CopyOnWriteArrayList<Block>();
+	public static CopyOnWriteArrayList<Block> mLoadedBlocks = new CopyOnWriteArrayList<Block>();
 
-	public TileManager() {
+	private World mWorld;
+
+	public TileManager(World world) {
+		mWorld = world;
 	}
 
 	public void tick(double deltaTime) {
 		for (Block eachBlock : mBlocks) {
 			eachBlock.tick(deltaTime);
-			
+
 			// we can move the blocks to the right
-			//eachBlock.mPostion.add(new Vector2F(1, 0));
-			
-			if(Player.s_Render.intersects(eachBlock.getBounds())){
+			// eachBlock.mPostion.add(new Vector2F(1, 0));
+
+			if (Player.s_Render.intersects(eachBlock)) {
 				eachBlock.setAlive(true);
-			}else{
+
+				if (!mLoadedBlocks.contains(eachBlock)) {
+					mLoadedBlocks.add(eachBlock);
+				}
+
+			} else {
+				if (mLoadedBlocks.contains(eachBlock)) {
+					mLoadedBlocks.remove(eachBlock);
+				}
 				eachBlock.setAlive(false);
+			}
+		}
+
+		if (!mWorld.getPlayer().isDebugging()) {
+			if (!mLoadedBlocks.isEmpty()) {
+				mLoadedBlocks.clear();
 			}
 		}
 	}
@@ -31,4 +51,31 @@ public class TileManager {
 			eachBlock.render(g);
 		}
 	}
+
+	public CopyOnWriteArrayList<Block> getBlocks() {
+		return mBlocks;
+	}
+
+	// public CopyOnWriteArrayList<Block> getLoadedBlocks(){
+	// return mLoadedBlocks;
+	// }
+	//
+	//
+	//
+	// public int getLoadedBlocksSize() {
+	// return mLoadedBlocks.size();
+	// }
+
+	// public ArrayList<Block> getMapBlocks(){
+	// ArrayList<Block>blocks = new ArrayList<Block>();
+	//
+	// for(Block eachBlock: mBlocks){
+	// if(!blocks.contains(eachBlock)){
+	// blocks.add(eachBlock);
+	// }
+	// }
+	//
+	// return blocks;
+	// }
+	//
 }

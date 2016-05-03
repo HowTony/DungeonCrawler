@@ -48,12 +48,18 @@ public class Player implements KeyListener {
 	private HUDmanager mHud;
 	private GUImanager mGui;
 	
+	private static boolean mMoving;
+	private static boolean s_Spawned;
+	
 	
 	//rendering
 	private int mRenderDistanceWidth = 64;
 	private int mRenderDistanceHeight = 28;
 	public static Rectangle s_Render;
 	
+	
+	//Debug
+	private static boolean s_Debug = false;
 	
 	//Button
 	
@@ -82,7 +88,7 @@ public class Player implements KeyListener {
 
 	public void init(World world) {
 		mGui = new GUImanager();
-		mHud = new HUDmanager(this);
+		mHud = new HUDmanager(mWorld);
 		this.mWorld = world;
 		
 		
@@ -140,6 +146,8 @@ public class Player implements KeyListener {
 		ani_idle.setSpeed(mAnimationSpeed);
 		ani_idle.play();
 		
+		s_Spawned = true;
+		
 	}
 
 	public void tick(double deltaTime) {
@@ -188,6 +196,9 @@ public class Player implements KeyListener {
 			 * 
 			 */
 			animationState = 4;
+			if(mMoving){
+				mMoving = false;
+			}
 		}
 		
 		if(mIsRunning){
@@ -594,17 +605,42 @@ public class Player implements KeyListener {
 		int key = e.getKeyCode();
 
 		if (key == KeyEvent.VK_W) {
+			if(!mMoving){
+				mMoving = true;
+				
+			}
 			mMovingUp = true;
 		}
 		if (key == KeyEvent.VK_S) {
+			if(!mMoving){
+				mMoving = true;
+				
+			}
 			mMovingDown = true;
 		}
 		if (key == KeyEvent.VK_A) {
+			if(!mMoving){
+				mMoving = true;
+				
+			}
 			mMovingLeft = true;
 		}
 		if (key == KeyEvent.VK_D) {
+			if(!mMoving){
+				mMoving = true;
+				
+			}
 			mMovingRight = true;
 		}
+		
+
+		//Debug
+		if(key == KeyEvent.VK_F3)
+			if(!s_Debug){
+				s_Debug = true;
+			}else{
+				s_Debug = false;
+			}
 		
 		//Sprint
 		if(key == KeyEvent.VK_SHIFT){
@@ -665,6 +701,19 @@ public class Player implements KeyListener {
 	
 	public float getSLOWDOWN() {
 		return SLOWDOWN;
+	}
+	
+	
+	public boolean isDebugging(){
+		return s_Debug;
+	}
+	
+	public boolean isMoving(){
+		return mMoving;
+	}
+	
+	public boolean hasSpawned(){
+		return s_Spawned;
 	}
 	
 	

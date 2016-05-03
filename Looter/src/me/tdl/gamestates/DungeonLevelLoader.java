@@ -20,6 +20,9 @@ public class DungeonLevelLoader extends GameState{
 	public void init() {
 		mWorld = new World("World");
 		mWorld.setSize(100,100);	
+		
+		mWorld.setWorldSpawn(50, 50);
+		
 		mWorld.addPlayer(new Player());
 		
 		mWorld.init();
@@ -29,13 +32,20 @@ public class DungeonLevelLoader extends GameState{
 
 	@Override
 	public void tick(double deltaTime) {
-		mWorld.tick(deltaTime);
+		if(mWorld.hasGenerated()){
+			mWorld.tick(deltaTime);
+		}
+		
 		
 	}
 
 	@Override
 	public void render(Graphics2D g) {
-		mWorld.render(g);
+		
+		if(mWorld.hasGenerated()){
+			mWorld.render(g);
+		}
+		
 		g.clipRect(0, 0, Main.mWidth, Main.mHeight);
 	}
 
