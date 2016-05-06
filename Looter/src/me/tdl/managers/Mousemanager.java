@@ -8,6 +8,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import me.tdl.generator.World;
 import me.tdl.main.Assets;
 
 public class Mousemanager implements MouseListener, MouseMotionListener, MouseWheelListener {
@@ -19,6 +20,42 @@ public class Mousemanager implements MouseListener, MouseMotionListener, MouseWh
 
 	public void tick() {
 		mMouse = new Point(mMouseMovedX, mMouseMovedY);
+
+		if (HUDmanager.getS_Up() != null) {
+			if (HUDmanager.getS_Up().contains(mMouse)) {
+				if (s_Pressed) {
+					World.getPlayer().moveMapUpGlide(3);
+					;
+				}
+			}
+		}
+		
+		if (HUDmanager.getS_Down() != null) {
+			if (HUDmanager.getS_Down().contains(mMouse)) {
+				if (s_Pressed) {
+					World.getPlayer().moveMapDownGlide(3);
+					;
+				}
+			}
+		}
+		
+		if (HUDmanager.getS_Right() != null) {
+			if (HUDmanager.getS_Right().contains(mMouse)) {
+				if (s_Pressed) {
+					World.getPlayer().moveMapRightGlide(3);
+					;
+				}
+			}
+		}
+		
+		if (HUDmanager.getS_Left() != null) {
+			if (HUDmanager.getS_Left().contains(mMouse)) {
+				if (s_Pressed) {
+					World.getPlayer().moveMapLeftGlide(3);
+					;
+				}
+			}
+		}
 	}
 
 	public void render(Graphics2D g) {

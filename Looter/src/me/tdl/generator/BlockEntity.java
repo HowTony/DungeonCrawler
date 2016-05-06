@@ -74,7 +74,7 @@ public class BlockEntity extends Rectangle{
 		}
 	}
 	
-	public void render(Graphics2D g){
+	public void render(Graphics2D g){ 
 		if(mIsAlive){
 			if(mIsDying){
 				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, mLifeFade));

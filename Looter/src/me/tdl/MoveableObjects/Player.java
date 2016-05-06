@@ -9,6 +9,7 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import me.tdl.gamestates.DungeonLevelLoader;
 import me.tdl.generator.World;
 import me.tdl.main.Animator;
 import me.tdl.main.Assets;
@@ -26,43 +27,44 @@ public class Player implements KeyListener {
 	private int mWidth = 32;
 	private int mHeight = 32;
 	private int mScale = 2;
-	
-	Color mColorTranslucent = new Color(0, 0, 0, 0);
+
+	private Color mColorTranslucent = new Color(0, 0, 0, 0);
 
 	private static boolean mMovingUp, mMovingDown, mMovingLeft, mMovingRight, mIsRunning;
-	
-	private final float RUN_SPEED = 48;
+	private static boolean mDamaged;
+
+	private final float RUN_SPEED = 64;
 	private float mCurrentMoveSpeed = 4 * 32F;
 	private float mFixDeltaTime = 1.5F / 60F;
 	private final float SLOWDOWN = 3F;
-	
-	Mousemanager mPlayerMM = new Mousemanager();
+
+	private Mousemanager mPlayerMM = new Mousemanager();
+	PlayerStats mPlayerStats = new PlayerStats(this);
 
 	private float mStartSpeedUp = 0;
 	private float mStartSpeedDown = 0;
 	private float mStartSpeedLeft = 0;
 	private float mStartSpeedRight = 0;
-	
+
 	private long mAnimationSpeed = 120;
-	
+
 	private HUDmanager mHud;
 	private GUImanager mGui;
-	
+	private PlayerActions mPlayerActions;
+
 	private static boolean mMoving;
 	private static boolean s_Spawned;
-	
-	
-	//rendering
+
+	// rendering
 	private int mRenderDistanceWidth = 64;
 	private int mRenderDistanceHeight = 28;
 	public static Rectangle s_Render;
-	
-	
-	//Debug
+
+	// Debug
 	private static boolean s_Debug = false;
-	
-	//Button
-	
+
+	// Button
+
 	private int animationState = 0;
 	private ArrayList<BufferedImage> mAnimationUp;
 	Animator ani_up;
@@ -75,27 +77,33 @@ public class Player implements KeyListener {
 	private ArrayList<BufferedImage> mAnimationIdle;
 	Animator ani_idle;
 	
+	private double mDamageTime = 1;
 
 	public Player() {
 		/*
 		 * set pos to put player in the middle of screen.
 		 */
 		pos = new Vector2F(Main.mWidth / 2 - mWidth / 2, Main.mHeight / 2 - mHeight / 2);
-	
 
-	
 	}
 
 	public void init(World world) {
-		mGui = new GUImanager();
+		mPlayerActions = new PlayerActions(mWorld);
 		mHud = new HUDmanager(mWorld);
+		mGui = new GUImanager();
 		this.mWorld = world;
-		
-		
+
 		System.out.println(mWorld.getWorldName() + "");
+
+		s_Render = new Rectangle(
+				(int) (pos.mXPosition - pos.getWorldLocation().mXPosition + pos.mXPosition - mRenderDistanceWidth*32 / 2 + mWidth / 2),
+				(int) (pos.mYPosition - pos.getWorldLocation().mYPosition + pos.mYPosition - mRenderDistanceHeight*32 / 2 + mHeight/ 2),
+				mRenderDistanceWidth  * 32,
+				mRenderDistanceHeight * 32);
 		
 		
-		s_Render = new Rectangle(((int)pos.mXPosition), (int)pos.mYPosition, mRenderDistanceWidth * 32, mRenderDistanceHeight * 32);
+		
+		
 
 		mAnimationDown = new ArrayList<BufferedImage>();
 		mAnimationUp = new ArrayList<BufferedImage>();
@@ -118,7 +126,7 @@ public class Player implements KeyListener {
 		mAnimationLeft.add(Assets.mPlayer.getTile(0, 48, 16, 16));
 		mAnimationLeft.add(Assets.mPlayer.getTile(16, 48, 16, 16));
 		mAnimationLeft.add(Assets.mPlayer.getTile(32, 48, 16, 16));
-		
+
 		mAnimationIdle.add(Assets.mPlayer.getTile(16, 0, 16, 16));
 
 		// DOWN
@@ -145,21 +153,34 @@ public class Player implements KeyListener {
 		ani_idle = new Animator(mAnimationIdle);
 		ani_idle.setSpeed(mAnimationSpeed);
 		ani_idle.play();
-		
+
 		s_Spawned = true;
-		
+
 	}
 
 	public void tick(double deltaTime) {
-		
+
 		mPlayerMM.tick();
+		mPlayerStats.tick();
+		//mPlayerActions.tick();
 		
+		if(isDamaged()){
+			if(mDamageTime != 0){
+				mDamageTime -= 0.1;
+			}
+			if(mDamageTime <= 0){
+				setDamaged(false);
+				mDamageTime = 1;
+			}
+		}
+
 		s_Render = new Rectangle(
-				(int) (pos.mXPosition - pos.getWorldLocation().mXPosition + pos.mXPosition - mRenderDistanceWidth * 32 / 2 + mWidth / 2),
-				(int) (pos.mYPosition - pos.getWorldLocation().mYPosition + pos.mYPosition - mRenderDistanceHeight* 32 / 2 + mHeight / 2),
-				mRenderDistanceWidth * 32,
-				mRenderDistanceHeight * 32);
-		
+				(int) (pos.mXPosition - pos.getWorldLocation().mXPosition + pos.mXPosition
+						- mRenderDistanceWidth * 32 / 2 + mWidth / 2),
+				(int) (pos.mYPosition - pos.getWorldLocation().mYPosition + pos.mYPosition
+						- mRenderDistanceHeight * 32 / 2 + mHeight / 2),
+				mRenderDistanceWidth * 32, mRenderDistanceHeight * 32);
+
 		float moveAmountUP = (float) (mStartSpeedUp * mFixDeltaTime);
 		float moveAmountDOWN = (float) (mStartSpeedDown * mFixDeltaTime);
 		float moveAmountLEFT = (float) (mStartSpeedLeft * mFixDeltaTime);
@@ -196,13 +217,13 @@ public class Player implements KeyListener {
 			 * 
 			 */
 			animationState = 4;
-			if(mMoving){
+			if (mMoving) {
 				mMoving = false;
 			}
 		}
-		
-		if(mIsRunning){
-			if(mAnimationSpeed != 120){
+
+		if (mIsRunning) {
+			if (mAnimationSpeed != 120) {
 				mAnimationSpeed = 120;
 				ani_down.setSpeed(mAnimationSpeed);
 				ani_up.setSpeed(mAnimationSpeed);
@@ -210,10 +231,10 @@ public class Player implements KeyListener {
 				ani_right.setSpeed(mAnimationSpeed);
 				ani_idle.setSpeed(mAnimationSpeed);
 				mCurrentMoveSpeed += RUN_SPEED;
-				
+
 			}
-		}else{
-			if(mAnimationSpeed != 180){
+		} else {
+			if (mAnimationSpeed != 180) {
 				mAnimationSpeed = 180;
 				ani_down.setSpeed(mAnimationSpeed);
 				ani_up.setSpeed(mAnimationSpeed);
@@ -221,9 +242,74 @@ public class Player implements KeyListener {
 				ani_right.setSpeed(mAnimationSpeed);
 				ani_idle.setSpeed(mAnimationSpeed);
 				mCurrentMoveSpeed -= RUN_SPEED;
-				
+
 			}
 		}
+	}
+	
+	public void render(Graphics2D g) {
+		g.setColor(mColorTranslucent);
+		g.fillRect((int) pos.mXPosition, (int) pos.mYPosition, mWidth, mHeight);
+
+		if (animationState == 0) {
+			// UP
+			g.drawImage(ani_up.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight,
+					mWidth * mScale, mHeight * mScale, null);
+			if (mMovingUp) {
+				ani_up.update(System.currentTimeMillis());
+			}
+		}
+		if (animationState == 1) {
+			// DOWN
+			g.drawImage(ani_down.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight,
+					mWidth * mScale, mHeight * mScale, null);
+			if (mMovingDown) {
+				ani_down.update(System.currentTimeMillis());
+			}
+		}
+		if (animationState == 2) {
+			// LEFT
+			g.drawImage(ani_left.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight,
+					mWidth * mScale, mHeight * mScale, null);
+			if (mMovingLeft) {
+				ani_left.update(System.currentTimeMillis());
+			}
+		}
+		if (animationState == 3) {
+			// RIGHT
+			g.drawImage(ani_right.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight,
+					mWidth * mScale, mHeight * mScale, null);
+			if (mMovingRight) {
+				ani_right.update(System.currentTimeMillis());
+			}
+
+		}
+		if (animationState == 4) {
+			// IDLE
+			g.drawImage(ani_idle.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight,
+					mWidth * mScale, mHeight * mScale, null);
+
+			ani_idle.update(System.currentTimeMillis());
+
+		}
+		
+		if(isDamaged()){
+			g.drawImage(Assets.getTake_damage(),  (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight,
+					mWidth * mScale, mHeight * mScale, null);
+			
+		}
+		
+		mPlayerStats.render(g);
+
+		g.drawRect((int) pos.mXPosition - mRenderDistanceWidth * 32 / 2 + mWidth / 2,
+				(int) pos.mYPosition - mRenderDistanceHeight * 32 / 2 + mHeight / 2, mRenderDistanceWidth * 32,
+				mRenderDistanceHeight * 32);
+
+		mHud.render(g);
+		mGui.render(g);
+		mPlayerMM.render(g);
+	
+
 	}
 
 	/*
@@ -386,8 +472,7 @@ public class Player implements KeyListener {
 			mStartSpeedUp = 0;
 		}
 	}
-	
-	
+
 	public void moveMapUpGlide(float speed) {
 		if (!Check.CollisionPlayerBlock(
 
@@ -541,115 +626,56 @@ public class Player implements KeyListener {
 		}
 	}
 
-	public void render(Graphics2D g) {
-		g.setColor(mColorTranslucent);
-		g.fillRect((int) pos.mXPosition, (int) pos.mYPosition, mWidth, mHeight);
-
-		
-
-		if (animationState == 0) {
-			// UP
-			g.drawImage(ani_up.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight, mWidth * mScale, mHeight * mScale,
-					null);
-			if (mMovingUp) {
-				ani_up.update(System.currentTimeMillis());
-			}
-		}
-		if (animationState == 1) {
-			// DOWN
-			g.drawImage(ani_down.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight, mWidth * mScale, mHeight * mScale,
-					null);
-			if (mMovingDown) {
-				ani_down.update(System.currentTimeMillis());
-			}
-		}
-		if (animationState == 2) {
-			// LEFT
-			g.drawImage(ani_left.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight, mWidth * mScale, mHeight * mScale,
-					null);
-			if (mMovingLeft) {
-				ani_left.update(System.currentTimeMillis());
-			}
-		}
-		if (animationState == 3) {
-			// RIGHT
-			g.drawImage(ani_right.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight, mWidth * mScale, mHeight * mScale,
-					null);
-			if (mMovingRight) {
-				ani_right.update(System.currentTimeMillis());
-			}
-
-		}
-		if (animationState == 4) {
-			// IDLE
-			g.drawImage(ani_idle.mSprite, (int) pos.mXPosition - mWidth / 2, (int) pos.mYPosition - mHeight, mWidth * mScale, mHeight * mScale,
-					null);
-			
-			ani_idle.update(System.currentTimeMillis());
-			
-		}
-		
-		g.drawRect((int)pos.mXPosition - mRenderDistanceWidth * 32 /2 + mWidth / 2, (int)pos.mYPosition - mRenderDistanceHeight * 32 / 2 + mHeight / 2, mRenderDistanceWidth * 32, mRenderDistanceHeight * 32);
-		
-		mHud.render(g);
-		mGui.render(g);
-		mPlayerMM.render(g);
-
-		
-		
-		
-	}
+	
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
 
 		if (key == KeyEvent.VK_W) {
-			if(!mMoving){
+			if (!mMoving) {
 				mMoving = true;
-				
+
 			}
 			mMovingUp = true;
 		}
 		if (key == KeyEvent.VK_S) {
-			if(!mMoving){
+			if (!mMoving) {
 				mMoving = true;
-				
+
 			}
 			mMovingDown = true;
 		}
 		if (key == KeyEvent.VK_A) {
-			if(!mMoving){
+			if (!mMoving) {
 				mMoving = true;
-				
+
 			}
 			mMovingLeft = true;
 		}
 		if (key == KeyEvent.VK_D) {
-			if(!mMoving){
+			if (!mMoving) {
 				mMoving = true;
-				
+
 			}
 			mMovingRight = true;
 		}
-		
 
-		//Debug
-		if(key == KeyEvent.VK_F3)
-			if(!s_Debug){
+		// Debug
+		if (key == KeyEvent.VK_F3)
+			if (!s_Debug) {
 				s_Debug = true;
-			}else{
+			} else {
 				s_Debug = false;
 			}
-		
-		//Sprint
-		if(key == KeyEvent.VK_SHIFT){
+
+		// Sprint
+		if (key == KeyEvent.VK_SHIFT) {
 			mIsRunning = true;
-			
+
 		}
-		
-		
-		//Exit game
+
+		// Exit game
 		if (key == KeyEvent.VK_ESCAPE) {
 			System.exit(1);
 		}
@@ -672,8 +698,13 @@ public class Player implements KeyListener {
 		if (key == KeyEvent.VK_D) {
 			mMovingRight = false;
 		}
-		if(key == KeyEvent.VK_SHIFT){
+		if (key == KeyEvent.VK_SHIFT) {
 			mIsRunning = false;
+
+		}
+		
+		if (key == KeyEvent.VK_P) {
+			DungeonLevelLoader.mWorld2.changeToWorld("world", "map2");
 
 		}
 
@@ -684,38 +715,74 @@ public class Player implements KeyListener {
 		// TODO Auto-generated method stub
 
 	}
-	
-	
-	
+
 	////////////////////////////////////
 	///////////////////////////////////
-	
-	
+
 	public Vector2F getPos() {
 		return pos;
 	}
-	
+
 	public float getMaxSpeed() {
 		return mCurrentMoveSpeed;
 	}
-	
+
 	public float getSLOWDOWN() {
 		return SLOWDOWN;
 	}
-	
-	
-	public boolean isDebugging(){
+
+	public boolean isDebugging() {
 		return s_Debug;
 	}
-	
-	public boolean isMoving(){
+
+	public boolean isMoving() {
 		return mMoving;
 	}
-	
-	public boolean hasSpawned(){
+
+	public boolean hasSpawned() {
 		return s_Spawned;
 	}
 	
+	public PlayerActions getPlayerActions(){
+		return mPlayerActions;
+	}
+
+	public class PlayerActions {
+
+		private World mWorld1;
+
+		public PlayerActions(World world) {
+			this.mWorld1 = world;
+		}
+
+		public void attackUP() {
+
+		}
+
+		public void attackDOWN() {
+
+		}
+
+		public void attackRIGHT() {
+
+		}
+
+		public void attackLEFT() {
+
+		}
+		
+		public void run(){
+			
+		}
+
+	}
 	
+	public boolean isDamaged(){
+		return mDamaged;
+	}
 	
+	public void setDamaged(boolean b){
+		mDamaged = b;
+	}
+
 }

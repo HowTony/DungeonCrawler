@@ -17,6 +17,8 @@ public class Assets {
 	public static BufferedImage mouse_2;
 	public static BufferedImage button_notHeldOver;
 	public static BufferedImage button_heldOver;
+	public static BufferedImage health_bar;
+	public static BufferedImage take_damage;
 
 	public void init() {
 		mBlocks.setSpriteSheet(loadImageFrom.LoadImageFrom(Main.class, "spritesheet.png"));
@@ -29,6 +31,8 @@ public class Assets {
 		mouse_2 = mPlayer.getTile(55, 0, 8, 8);
 		button_notHeldOver = mPlayer.getTile(48, 16, 16, 8);
 		button_heldOver = mPlayer.getTile(48, 24, 16, 8);
+		health_bar = mPlayer.getTile(48, 8, 32, 8);
+		take_damage  = mPlayer.getTile(0, 64, 16, 16);
 	}
 
 	public static BufferedImage getStone_1() {
@@ -57,6 +61,14 @@ public class Assets {
 	
 	public static BufferedImage getButtonHeldover(){
 		return button_heldOver;
+	}
+	
+	public static BufferedImage getHealthBar(){
+		return health_bar;
+	}
+	
+	public static BufferedImage getTake_damage() {
+		return take_damage;
 	}
 	
 

@@ -28,7 +28,7 @@ public class IDGameLoop extends JPanel implements Runnable {
 	public Graphics2D mGraphics2D;
 	private BufferedImage mImage;
 
-	public static double currentFPS = 120D;
+	public static double currentFPS = 100D;
 
 	public IDGameLoop(int width, int height) {
 		this.mWidth = width;
@@ -88,9 +88,9 @@ public class IDGameLoop extends JPanel implements Runnable {
 
 			if (System.currentTimeMillis() - lastTimer >= 1000) {
 				lastTimer += 1000;
-				mTicksPerSecond = frames;
-				mFramesPerSecond = ticks; 
-				mFPS = mTicksPerSecond;
+				mTicksPerSecond = ticks;
+				mFramesPerSecond = frames; 
+				mFPS = mFramesPerSecond;
 				frames = 0;
 				ticks = 0;
 
@@ -122,5 +122,13 @@ public class IDGameLoop extends JPanel implements Runnable {
 		g2.dispose();
 	}
 	
+	
+	public int getmFramesPerSecond() {
+		return mFramesPerSecond;
+	}
+	
+	public int getmTicksPerSecond() {
+		return mTicksPerSecond;
+	}
 
 }

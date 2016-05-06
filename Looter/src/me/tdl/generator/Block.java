@@ -1,5 +1,7 @@
 package me.tdl.generator;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -16,6 +18,8 @@ public class Block extends Rectangle {
 	private boolean isSolid;
 	private boolean isAlive;
 	private boolean mDropped = false;
+
+	private float mLightLevel = .5f;
 
 	public Block(Vector2F pos) {
 		setBounds((int) pos.mXPosition, (int) pos.mYPosition, BLOCK_SIZE, BLOCK_SIZE);
@@ -56,6 +60,22 @@ public class Block extends Rectangle {
 		if (isAlive) {
 			setBounds((int) mPostion.mXPosition, (int) mPostion.mYPosition, BLOCK_SIZE, BLOCK_SIZE);
 		}
+		
+		if(mLightLevel > 0.050f && mLightLevel < 0.40f){
+			mLightLevel = 0.250f;
+		}
+	}
+
+	// Light blocks
+	public void renderBlockLightLevel(Graphics2D g) {
+		if(mLightLevel > 0f){
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, mLightLevel));
+			g.setColor(Color.BLACK);
+			g.fillRect((int) mPostion.getWorldLocation().mXPosition, (int) mPostion.getWorldLocation().mYPosition,
+					BLOCK_SIZE, BLOCK_SIZE);
+			g.setColor(Color.WHITE);
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
+		}
 	}
 
 	public void render(Graphics2D g) {
@@ -87,9 +107,31 @@ public class Block extends Rectangle {
 			}
 		}
 	}
-	
-	
-	public Vector2F getBlockLocation(){
+
+	public float getLightLevel() {
+		return mLightLevel;
+	}
+
+	public void addShadows(LightSource source, float amount) {
+		if (mLightLevel != 1) {
+			if (!this.getBounds().intersects(source.getLightDetection())) {
+
+				if (mLightLevel < 0.981000) {
+					mLightLevel += amount;
+				}
+			}
+		}
+	}
+
+	public void removeShadows(float amount) {
+
+		if (mLightLevel > 0.001000) {
+			mLightLevel -= amount;
+		}
+
+	}
+
+	public Vector2F getBlockLocation() {
 		return mPostion;
 	}
 

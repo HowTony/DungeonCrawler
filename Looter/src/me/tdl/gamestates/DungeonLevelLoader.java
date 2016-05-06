@@ -10,30 +10,45 @@ import me.tdl.main.Main;
 
 public class DungeonLevelLoader extends GameState{
 	
-	private World mWorld;
+	public static World mWorld2;
+	private String mWorldName;
+	private String mMapName;
 
 	public DungeonLevelLoader(GameStateManager gsm) {
 		super(gsm);	
 	}
+	
+	public DungeonLevelLoader(GameStateManager gsm, String worldName, String mapName) {
+		super(gsm);	
+		this.mWorldName = worldName;
+		this.mMapName = mapName;
+		
+	}
 
 	@Override
 	public void init() {
-		mWorld = new World("World");
-		mWorld.setSize(100,100);	
 		
-		mWorld.setWorldSpawn(50, 50);
+		if(mWorldName == null){
+			mWorldName = "NULL";
+			mMapName = "map";
+		}
 		
-		mWorld.addPlayer(new Player());
+		mWorld2 = new World(mWorldName, s_GameStateManager);
+		mWorld2.setSize(100,100);	
 		
-		mWorld.init();
-		mWorld.generate("map");
+		mWorld2.setWorldSpawn(50, 50);
+		
+		mWorld2.addPlayer(new Player());
+		
+		mWorld2.init();
+		mWorld2.generate(mMapName);
 		
 	}
 
 	@Override
 	public void tick(double deltaTime) {
-		if(mWorld.hasGenerated()){
-			mWorld.tick(deltaTime);
+		if(mWorld2.hasGenerated()){
+			mWorld2.tick(deltaTime);
 		}
 		
 		
@@ -42,11 +57,13 @@ public class DungeonLevelLoader extends GameState{
 	@Override
 	public void render(Graphics2D g) {
 		
-		if(mWorld.hasGenerated()){
-			mWorld.render(g);
+		if(mWorld2.hasGenerated()){
+			mWorld2.render(g);
 		}
 		
 		g.clipRect(0, 0, Main.mWidth, Main.mHeight);
 	}
+	
+	
 
 }

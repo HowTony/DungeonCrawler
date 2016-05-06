@@ -1,5 +1,6 @@
 package me.tdl.generator;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -7,6 +8,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import com.sun.javafx.geom.transform.GeneralTransform3D;
 
 import me.tdl.MoveableObjects.Player;
+import me.tdl.gamestate.GameStateManager;
+import me.tdl.gamestates.DungeonLevelLoader;
 import me.tdl.generator.Block.BlockType;
 import me.tdl.main.Main;
 import my.project.gop.main.Vector2F;
@@ -20,11 +23,12 @@ public class World {
 	private int mWorldWidth;
 	private int mWorldHeight;
 	private int mBlockSize = 48;
-	
-	
+
 	private boolean mHasGenerated;
 
-	private Player mPlayer;
+	private static Player s_Player;
+
+	private LightManager mLightManager;
 
 	// Lists
 	private CopyOnWriteArrayList<BlockEntity> mBlockEnts;
@@ -37,42 +41,43 @@ public class World {
 	// Booleans
 	private boolean mHasSize = false;
 
-	public World(String world) {
+	private GameStateManager mGameStateManager;
+
+	public World(String world, GameStateManager gameStateManager) {
 		mWorldName = world;
 		Vector2F.setWorldVariables(s_MapPosition.mXPosition, s_MapPosition.mYPosition);
+		this.mGameStateManager = gameStateManager;
 	}
 
 	public void init() {
 		mBlockEnts = new CopyOnWriteArrayList<BlockEntity>();
 		mTiles = new TileManager(this);
 
-		s_MapPosition.mXPosition = mSpawn.getBlockLocation().mXPosition - mPlayer.getPos().mXPosition;
-		s_MapPosition.mYPosition = mSpawn.getBlockLocation().mYPosition - mPlayer.getPos().mYPosition;
+		mLightManager = new LightManager(mTiles.getBlocks());
+		mLightManager.init();
 
-		if (mPlayer != null) {
-			mPlayer.init(this);
+		s_MapPosition.mXPosition = mSpawn.getBlockLocation().mXPosition - s_Player.getPos().mXPosition;
+		s_MapPosition.mYPosition = mSpawn.getBlockLocation().mYPosition - s_Player.getPos().mYPosition;
+
+		if (s_Player != null) {
+			s_Player.init(this);
 		}
 
 	}
 
 	public void tick(double deltaTime) {
-		
-		
 		Vector2F.setWorldVariables(s_MapPosition.mXPosition, s_MapPosition.mYPosition);
-		
-		
-		
-		
-		if(!mPlayer.hasSpawned()){
+
+		if (!s_Player.hasSpawned()) {
 			mSpawn.tick(deltaTime);
 		}
-		
 
 		mTiles.tick(deltaTime);
+		mLightManager.tick();
 
 		if (!mBlockEnts.isEmpty()) {
 			for (BlockEntity eachBlockEnt : mBlockEnts) {
-				if (mPlayer.s_Render.intersects(eachBlockEnt)) {
+				if (s_Player.s_Render.intersects(eachBlockEnt)) {
 					eachBlockEnt.tick(deltaTime);
 					eachBlockEnt.setAlive(true);
 				} else {
@@ -81,32 +86,45 @@ public class World {
 			}
 		}
 
-		if (mPlayer != null) {
-			mPlayer.tick(deltaTime);
+		if (s_Player != null) {
+			s_Player.tick(deltaTime);
 		}
 	}
 
 	public void render(Graphics2D g) {
 		mTiles.render(g);
-		
-		
-		if(!mPlayer.hasSpawned()){
+
+		if (!s_Player.hasSpawned()) {
 			mSpawn.render(g);
 		}
 
-
-
-		if (!mBlockEnts.isEmpty()) {
-			for (BlockEntity eachBlockEnt : mBlockEnts) {
-				if (mPlayer.s_Render.intersects(eachBlockEnt)) {
-					eachBlockEnt.render(g);
-				}
+		for (BlockEntity eachBlockEnt : mBlockEnts) {
+			if (s_Player.s_Render.intersects(eachBlockEnt)) {
+				eachBlockEnt.render(g);
 			}
 		}
+		
 
-		if (mPlayer != null) {
-			mPlayer.render(g);
+		if (s_Player != null) {
+			s_Player.render(g);
 		}
+
+		for (Block eachBlock : TileManager.mBlocks) {
+			if (s_Player.s_Render.intersects(eachBlock)) {
+				eachBlock.renderBlockLightLevel(g);
+			}
+		}
+		
+
+		mLightManager.render(g);
+
+		
+		//black boarder bars
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, Main.mWidth, Main.mHeight / 6);
+		g.fillRect(0, 1000, Main.mWidth, Main.mHeight / 6);
+		g.clipRect(0, 0, Main.mWidth, Main.mHeight);
+
 	}
 
 	public void generate(String world_image_name) {
@@ -125,13 +143,11 @@ public class World {
 
 					switch (col & 0xFFFFFF) {
 					case 0x808080:
-						mTiles.mBlocks.add(
-								new Block(new Vector2F(x * 48, y * 48), BlockType.STONE_1).isSolid(false));
+						mTiles.mBlocks.add(new Block(new Vector2F(x * 48, y * 48), BlockType.STONE_1).isSolid(false));
 						break;
 
 					case 0x404040:
-						mTiles.mBlocks.add(
-								new Block(new Vector2F(x * 48, y * 48), BlockType.WALL_1).isSolid(true));
+						mTiles.mBlocks.add(new Block(new Vector2F(x * 48, y * 48), BlockType.WALL_1).isSolid(true));
 						break;
 
 					case 0x707070:
@@ -143,7 +159,7 @@ public class World {
 				}
 			}
 		}
-		
+
 		mHasGenerated = true;
 	}
 
@@ -167,7 +183,7 @@ public class World {
 	}
 
 	public void addPlayer(Player player) {
-		this.mPlayer = player;
+		this.s_Player = player;
 
 	}
 
@@ -201,14 +217,33 @@ public class World {
 		return this.mWorldName;
 	}
 
-	public Player getPlayer() {
-		return this.mPlayer;
+	public static Player getPlayer() {
+		return World.s_Player;
 	}
-	
-	public boolean hasGenerated(){
+
+	public boolean hasGenerated() {
 		return mHasGenerated;
 	}
 
+	public void resetWorld() {
+		mTiles.getBlocks().clear();
+		mTiles.getLoadedBlocks().clear();
+		mBlockEnts.clear();
+		mSpawn = null;
+	}
 
+	public void changeToWorld(String world_name, String map_name) {
+
+		if (mWorldName != world_name) {
+			resetWorld();
+			mGameStateManager.s_States.push(new DungeonLevelLoader(mGameStateManager, world_name, map_name));
+			mGameStateManager.s_States.peek().init();
+		}
+
+	}
+
+	public LightManager getLightManager() {
+		return mLightManager;
+	}
 
 }

@@ -12,9 +12,13 @@ public class TileManager {
 	public static CopyOnWriteArrayList<Block> mLoadedBlocks = new CopyOnWriteArrayList<Block>();
 
 	private World mWorld;
+	
+
+
 
 	public TileManager(World world) {
 		mWorld = world;
+		
 	}
 
 	public void tick(double deltaTime) {
@@ -23,6 +27,9 @@ public class TileManager {
 
 			// we can move the blocks to the right
 			// eachBlock.mPostion.add(new Vector2F(1, 0));
+			
+			
+			
 
 			if (Player.s_Render.intersects(eachBlock)) {
 				eachBlock.setAlive(true);
@@ -38,6 +45,8 @@ public class TileManager {
 				eachBlock.setAlive(false);
 			}
 		}
+		
+		
 
 		if (!mWorld.getPlayer().isDebugging()) {
 			if (!mLoadedBlocks.isEmpty()) {
@@ -47,35 +56,20 @@ public class TileManager {
 	}
 
 	public void render(Graphics2D g) {
+		
 		for (Block eachBlock : mBlocks) {
 			eachBlock.render(g);
 		}
+		
+		
 	}
 
-	public CopyOnWriteArrayList<Block> getBlocks() {
+	public static CopyOnWriteArrayList<Block> getBlocks() {
 		return mBlocks;
 	}
+	
+	public static CopyOnWriteArrayList<Block> getLoadedBlocks(){
+		return mLoadedBlocks;
+	}
 
-	// public CopyOnWriteArrayList<Block> getLoadedBlocks(){
-	// return mLoadedBlocks;
-	// }
-	//
-	//
-	//
-	// public int getLoadedBlocksSize() {
-	// return mLoadedBlocks.size();
-	// }
-
-	// public ArrayList<Block> getMapBlocks(){
-	// ArrayList<Block>blocks = new ArrayList<Block>();
-	//
-	// for(Block eachBlock: mBlocks){
-	// if(!blocks.contains(eachBlock)){
-	// blocks.add(eachBlock);
-	// }
-	// }
-	//
-	// return blocks;
-	// }
-	//
 }

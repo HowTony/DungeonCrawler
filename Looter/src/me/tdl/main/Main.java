@@ -22,7 +22,13 @@ public class Main {
 	public static int mWidth = gd.getDisplayMode().getWidth();
 	public static int mHeight = gd.getDisplayMode().getHeight();
 	
+	//public static int mWidth = 1440;
+	//public static int mHeight = 900;
+	
+	
     public static void main(String[] args){
+    	
+    	System.out.println(mWidth + " " + mHeight);
     	GameWindow frame = new GameWindow("TheDLooter", mWidth, mHeight);
     	frame.setFullscreen(1);
     	Toolkit toolkit = Toolkit.getDefaultToolkit();
