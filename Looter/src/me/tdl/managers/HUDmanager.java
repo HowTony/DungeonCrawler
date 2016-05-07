@@ -18,7 +18,6 @@ import my.project.gop.main.loadImageFrom;
 
 public class HUDmanager {
 
-	// private Color mColorTranslucent;
 
 	// private BufferedImage mLightMap = new BufferedImage(100*32, 100*32,
 	// BufferedImage.TYPE_INT_ARGB);

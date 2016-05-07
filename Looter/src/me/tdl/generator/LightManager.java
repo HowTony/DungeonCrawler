@@ -30,9 +30,7 @@ public class LightManager {
 		for (LightSource eachLight : mLights) {
 			eachLight.render(g);
 		
-		}
-		
-		
+		}	
 	}
 
 	public void tick() {

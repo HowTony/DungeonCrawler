@@ -99,11 +99,7 @@ public class Player implements KeyListener {
 				(int) (pos.mXPosition - pos.getWorldLocation().mXPosition + pos.mXPosition - mRenderDistanceWidth*32 / 2 + mWidth / 2),
 				(int) (pos.mYPosition - pos.getWorldLocation().mYPosition + pos.mYPosition - mRenderDistanceHeight*32 / 2 + mHeight/ 2),
 				mRenderDistanceWidth  * 32,
-				mRenderDistanceHeight * 32);
-		
-		
-		
-		
+				mRenderDistanceHeight * 32);	
 
 		mAnimationDown = new ArrayList<BufferedImage>();
 		mAnimationUp = new ArrayList<BufferedImage>();
@@ -674,6 +670,12 @@ public class Player implements KeyListener {
 			mIsRunning = true;
 
 		}
+		
+		if (key == KeyEvent.VK_F10) {
+			mPlayerStats.damage(5f);
+
+		}
+		
 
 		// Exit game
 		if (key == KeyEvent.VK_ESCAPE) {

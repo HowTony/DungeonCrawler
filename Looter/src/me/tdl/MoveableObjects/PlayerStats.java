@@ -15,6 +15,8 @@ public class PlayerStats {
 	private float mHealth = 100;
 	private float mMaxHealth = 1;
 	private float mHealthScale = mHealth / mMaxHealth;
+	private float mDamageRedTime = mHealth /mMaxHealth;
+	private int mWaitTime = 20;
 	
 	
 	
@@ -24,15 +26,33 @@ public class PlayerStats {
 	
 	
 	public void tick(){
-		damage(5f);
+		//damage(5f);
 		
 	}
 	
 	public void render(Graphics2D g){
+		
+//		g.setColor(Color.YELLOW);
+//		if(!mPlayer.isDamaged()){
+//			if(mDamageRedTime > mHealthScale){
+//				if(mWaitTime != 0){
+//					mWaitTime--;
+//				}
+//				if(mWaitTime == 0){
+//					mDamageRedTime -= 1f;
+//					if(mDamageRedTime <= mHealthScale){
+//						mWaitTime = 20;
+//					}
+//				}
+//			}
+//			g.fillRect((int)mPlayer.getPos().mXPosition - 21, (int)mPlayer.getPos().mYPosition - 60, (int) mDamageRedTime, 32 - 10);
+//		}
+//		
+		
 		g.setColor(Color.RED);
-		g.fillRect((int)mPlayer.getPos().mXPosition - 20, (int)mPlayer.getPos().mYPosition - 60, 86, 32 - 10);
+		g.fillRect((int)mPlayer.getPos().mXPosition - 21, (int)mPlayer.getPos().mYPosition - 60, 87, 32 - 10);
 		g.setColor(Color.GREEN);
-		g.fillRect((int)mPlayer.getPos().mXPosition - 20, (int)mPlayer.getPos().mYPosition - 60, (int)mMaxHealth * (int)mHealthScale - 14, 32 - 10);
+		g.fillRect((int)mPlayer.getPos().mXPosition - 21, (int)mPlayer.getPos().mYPosition - 60, (int)mMaxHealth * (int)mHealthScale - 14, 32 - 10);
 		g.drawImage(Assets.getHealthBar(), (int)mPlayer.getPos().mXPosition - 27, (int)mPlayer.getPos().mYPosition - 70, 32*3, 32,null);
 	}
 	
@@ -41,8 +61,10 @@ public class PlayerStats {
 		if(mHealthScale > 0 && !mPlayer.isDamaged()){
 			mHealthScale -= amount;
 			mPlayer.setDamaged(true);
-		}else{
+			System.out.println("Player took damage");
 			
+		}else{
+			System.out.println("Player took NO damage");
 		}
 		
 	}
