@@ -1,17 +1,17 @@
 package me.tdl.generator;
 
 import java.awt.Graphics2D;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
 
 
 public class LightManager {
 
-	private CopyOnWriteArrayList<LightSource> mLights;
-	private CopyOnWriteArrayList<Block> mLoadBlocks;
+	private ArrayList<LightSource> mLights;
+	private ArrayList<Block> mLoadBlocks;
 	
 	
 
-	public LightManager(CopyOnWriteArrayList<Block> loadedBlocks) {
+	public LightManager(ArrayList<Block> loadedBlocks) {
 		mLoadBlocks = loadedBlocks;
 
 	}
@@ -20,7 +20,7 @@ public class LightManager {
 	
 
 	public void init() {
-		mLights = new CopyOnWriteArrayList<LightSource>();
+		mLights = new ArrayList<LightSource>();
 		light = new LightSource(200, 200, 10);
 		mLights.add(light);
 
@@ -52,7 +52,7 @@ public class LightManager {
 	}
 	
 	
-	public CopyOnWriteArrayList<LightSource> getLights() {
+	public ArrayList<LightSource> getLights() {
 		return mLights;
 	}
 	

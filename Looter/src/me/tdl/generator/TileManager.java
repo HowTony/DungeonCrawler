@@ -2,19 +2,15 @@ package me.tdl.generator;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import me.tdl.MoveableObjects.Player;
 
 public class TileManager {
 
-	public static CopyOnWriteArrayList<Block> mBlocks = new CopyOnWriteArrayList<Block>();
-	public static CopyOnWriteArrayList<Block> mLoadedBlocks = new CopyOnWriteArrayList<Block>();
+	public static ArrayList<Block> mBlocks = new ArrayList<Block>();
+	public static ArrayList<Block> mLoadedBlocks = new ArrayList<Block>();
 
 	private World mWorld;
-	
-
-
 
 	public TileManager(World world) {
 		mWorld = world;
@@ -27,9 +23,6 @@ public class TileManager {
 
 			// we can move the blocks to the right
 			// eachBlock.mPostion.add(new Vector2F(1, 0));
-			
-			
-			
 
 			if (Player.s_Render.intersects(eachBlock)) {
 				eachBlock.setAlive(true);
@@ -64,11 +57,11 @@ public class TileManager {
 		
 	}
 
-	public static CopyOnWriteArrayList<Block> getBlocks() {
+	public static ArrayList<Block> getBlocks() {
 		return mBlocks;
 	}
 	
-	public static CopyOnWriteArrayList<Block> getLoadedBlocks(){
+	public static ArrayList<Block> getLoadedBlocks(){
 		return mLoadedBlocks;
 	}
 

@@ -3,9 +3,7 @@ package me.tdl.generator;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import com.sun.javafx.geom.transform.GeneralTransform3D;
+import java.util.ArrayList;
 
 import me.tdl.MoveableObjects.Player;
 import me.tdl.gamestate.GameStateManager;
@@ -31,7 +29,7 @@ public class World {
 	private LightManager mLightManager;
 
 	// Lists
-	private CopyOnWriteArrayList<BlockEntity> mBlockEnts;
+	private ArrayList<BlockEntity> mBlockEnts;
 	private TileManager mTiles;
 
 	// world spawn
@@ -50,7 +48,7 @@ public class World {
 	}
 
 	public void init() {
-		mBlockEnts = new CopyOnWriteArrayList<BlockEntity>();
+		mBlockEnts = new ArrayList<BlockEntity>();
 		mTiles = new TileManager(this);
 
 		mLightManager = new LightManager(mTiles.getBlocks());

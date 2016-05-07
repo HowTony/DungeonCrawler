@@ -5,8 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-
-import com.sun.prism.j2d.paint.RadialGradientPaint;
+import java.awt.RadialGradientPaint;
 
 
 public class Light {
