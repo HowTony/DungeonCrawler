@@ -33,8 +33,8 @@ public class Player implements KeyListener {
 	private static boolean mMovingUp, mMovingDown, mMovingLeft, mMovingRight, mIsRunning;
 	private static boolean mDamaged;
 
-	private final float RUN_SPEED = 4;
-	private float mCurrentMoveSpeed = 16F;
+	private final float RUN_SPEED = 16F;
+	private float mCurrentMoveSpeed = 256F;
 	private float mFixDeltaTime = 1.5F / 60F;
 	private final float SLOWDOWN = 3F;
 
@@ -448,11 +448,8 @@ public class Player implements KeyListener {
 				new Point((int) (pos.mXPosition + mWorld.getWorldXpos() + mWidth),
 						(int) (pos.mYPosition + mWorld.getWorldYpos() - speed)))) {
 
-			if (mStartSpeedUp < mCurrentMoveSpeed) {
-				mStartSpeedUp += SLOWDOWN;
-			} else {
+
 				mStartSpeedUp = mCurrentMoveSpeed;
-			}
 
 			mWorld.s_MapPosition.mYPosition -= speed;
 		} else {
@@ -493,11 +490,7 @@ public class Player implements KeyListener {
 				new Point((int) (pos.mXPosition + mWorld.getWorldXpos() + mWidth),
 						(int) (pos.mYPosition + mWorld.getWorldYpos() + mHeight + speed)))) {
 
-			if (mStartSpeedDown < mCurrentMoveSpeed) {
-				mStartSpeedDown += SLOWDOWN;
-			} else {
 				mStartSpeedDown = mCurrentMoveSpeed;
-			}
 
 			mWorld.s_MapPosition.mYPosition += speed;
 		} else {
@@ -536,11 +529,7 @@ public class Player implements KeyListener {
 				new Point((int) (pos.mXPosition + mWorld.getWorldXpos() - speed),
 						(int) (pos.mYPosition + mWorld.getWorldYpos())))) {
 
-			if (mStartSpeedLeft < mCurrentMoveSpeed) {
-				mStartSpeedLeft += SLOWDOWN;
-			} else {
 				mStartSpeedLeft = mCurrentMoveSpeed;
-			}
 
 			mWorld.s_MapPosition.mXPosition -= speed;
 
@@ -579,11 +568,7 @@ public class Player implements KeyListener {
 				new Point((int) (pos.mXPosition + mWorld.getWorldXpos() + mWidth + speed),
 						(int) (pos.mYPosition + mWorld.getWorldYpos() + mHeight)))) {
 
-			if (mStartSpeedRight < mCurrentMoveSpeed) {
-				mStartSpeedRight += SLOWDOWN;
-			} else {
 				mStartSpeedRight = mCurrentMoveSpeed;
-			}
 
 			mWorld.s_MapPosition.mXPosition += speed;
 		} else {

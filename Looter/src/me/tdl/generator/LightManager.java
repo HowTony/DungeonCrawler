@@ -26,13 +26,6 @@ public class LightManager {
 
 	}
 
-	public void render(Graphics2D g) {
-		for (LightSource eachLight : mLights) {
-			eachLight.render(g);
-		
-		}	
-	}
-
 	public void tick() {
 		for (LightSource eachLight : mLights) {
 			eachLight.tick();

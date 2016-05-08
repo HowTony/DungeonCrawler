@@ -19,7 +19,8 @@ public class IDGameLoop extends JPanel implements Runnable {
 	private boolean mRunning;
 	
 	public static double mFPS = 0.0;
-	private int mFramesPerSecond; // frames per second
+	public static double sMPF = 0.0;
+	public static int sFPS; // frames per second
 	private int mTicksPerSecond; // ticks per second
 
 	private int mWidth;
@@ -27,8 +28,6 @@ public class IDGameLoop extends JPanel implements Runnable {
 
 	public Graphics2D mGraphics2D;
 	private BufferedImage mImage;
-
-	public static double currentFPS = 100D;
 
 	public IDGameLoop(int width, int height) {
 		this.mWidth = width;
@@ -53,14 +52,29 @@ public class IDGameLoop extends JPanel implements Runnable {
 		init();
 
 		long lastTime = System.nanoTime(); //
-		double nsPerTick = 1000000000D / currentFPS;
 		double deltaTime = 0;
-
+		sFPS = 0;
+		double fpsTimer = 0;
+		int fps = 0;
+		
 		while (mRunning) {
 			long now = System.nanoTime();
-			deltaTime = (now - lastTime) / nsPerTick;
+			deltaTime = (double) (now - lastTime) / (double) 1000000000D;
 			lastTime = now;
+			
+			fpsTimer += deltaTime;
+			fps++;
 
+			// fps update
+			if(fpsTimer > (double) 1) {
+				sFPS = fps;
+
+				fps = 0;
+				fpsTimer = 0;
+			}
+
+			sMPF = deltaTime * 1000;
+			
 			tick(deltaTime);
 			render();
 		}
@@ -89,14 +103,4 @@ public class IDGameLoop extends JPanel implements Runnable {
 		}
 		g2.dispose();
 	}
-	
-	
-	public int getmFramesPerSecond() {
-		return mFramesPerSecond;
-	}
-	
-	public int getmTicksPerSecond() {
-		return mTicksPerSecond;
-	}
-
 }

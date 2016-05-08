@@ -125,7 +125,8 @@ public class HUDmanager {
 		if (mWorld.getPlayer().isDebugging()) {
 			g.setColor(Color.WHITE);
 			g.drawString("[DEBUG]", 20, 20);
-			g.drawString("FPS: " + IDGameLoop.mFPS, 30, 50);
+			g.drawString("FPS: " + IDGameLoop.sFPS, 30, 50);
+			g.drawString("MPF: " + IDGameLoop.sMPF, 30, 90);
 		}
 		// g.drawString("[Map X position]" + mWorld.s_MapPosition.mXPosition,
 		// 30, 100);

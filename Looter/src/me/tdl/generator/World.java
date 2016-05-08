@@ -107,11 +107,11 @@ public class World {
 			s_Player.render(g);
 		}
 
-		for (Block eachBlock : TileManager.mBlocks) {
-			if (s_Player.s_Render.intersects(eachBlock)) {
-				eachBlock.renderBlockLightLevel(g);
-			}
-		}
+//		for (Block eachBlock : TileManager.mBlocks) {
+//			if (s_Player.s_Render.intersects(eachBlock)) {
+//				eachBlock.renderBlockLightLevel(g);
+//			}
+//		}
 		
 
 //		mLightManager.render(g);
