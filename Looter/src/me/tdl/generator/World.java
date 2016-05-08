@@ -114,14 +114,14 @@ public class World {
 		}
 		
 
-		mLightManager.render(g);
+//		mLightManager.render(g);
 
 		
 		//black boarder bars
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, Main.mWidth, Main.mHeight / 6);
-		g.fillRect(0, 1000, Main.mWidth, Main.mHeight / 6);
-		g.clipRect(0, 0, Main.mWidth, Main.mHeight);
+//		g.setColor(Color.BLACK);
+//		g.fillRect(0, 0, Main.mWidth, Main.mHeight / 6);
+//		g.fillRect(0, 1000, Main.mWidth, Main.mHeight / 6);
+//		g.clipRect(0, 0, Main.mWidth, Main.mHeight);
 
 	}
 

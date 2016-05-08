@@ -50,51 +50,19 @@ public class IDGameLoop extends JPanel implements Runnable {
 
 	@Override
 	public void run() {
-
 		init();
 
 		long lastTime = System.nanoTime(); //
 		double nsPerTick = 1000000000D / currentFPS;
-		int frames = 0;
-		int ticks = 0;
-		long lastTimer = System.currentTimeMillis();
 		double deltaTime = 0;
 
 		while (mRunning) {
 			long now = System.nanoTime();
-			deltaTime += (now - lastTime) / nsPerTick;
+			deltaTime = (now - lastTime) / nsPerTick;
 			lastTime = now;
-			boolean shouldRender = false;
 
-			while (deltaTime >= 1) {
-				ticks++;
-				/* TICK + DeltaTime */
-				tick(deltaTime);
-				deltaTime -= 1;
-				shouldRender = true;
-			}
-			
-			if(shouldRender){
-				frames++;
-				render();
-			}
-
-			// sleepy
-			try {
-				Thread.sleep(2);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-			if (System.currentTimeMillis() - lastTimer >= 1000) {
-				lastTimer += 1000;
-				mTicksPerSecond = ticks;
-				mFramesPerSecond = frames; 
-				mFPS = mFramesPerSecond;
-				frames = 0;
-				ticks = 0;
-
-			}
+			tick(deltaTime);
+			render();
 		}
 	}
 

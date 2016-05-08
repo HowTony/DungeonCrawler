@@ -122,11 +122,11 @@ public class HUDmanager {
 		
 		//g.drawImage(mLight, 0, 0, Main.mWidth, Main.mHeight, null);
 
-//		if (mWorld.getPlayer().isDebugging()) {
-//			g.setColor(Color.WHITE);
-//			g.drawString("[DEBUG]", 20, 20);
-//			g.drawString("FPS: " + IDGameLoop.mFPS, 30, 50);
-//		}
+		if (mWorld.getPlayer().isDebugging()) {
+			g.setColor(Color.WHITE);
+			g.drawString("[DEBUG]", 20, 20);
+			g.drawString("FPS: " + IDGameLoop.mFPS, 30, 50);
+		}
 		// g.drawString("[Map X position]" + mWorld.s_MapPosition.mXPosition,
 		// 30, 100);
 		// g.drawString("[Map Y position]" + mWorld.s_MapPosition.mYPosition,
@@ -138,10 +138,10 @@ public class HUDmanager {
 		// g.drawString("[Map Y position]" + mWorld.getWorldYpos(), 20, 60);
 		
 		
-		drawPolyonsCLEAR(g);
+//		drawPolygonsWHITE(g);
 		
 		
-		}
+	}
 	
 	public static Polygon getS_Up() {
 		return s_Up;

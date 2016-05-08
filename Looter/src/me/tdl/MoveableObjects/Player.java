@@ -33,8 +33,8 @@ public class Player implements KeyListener {
 	private static boolean mMovingUp, mMovingDown, mMovingLeft, mMovingRight, mIsRunning;
 	private static boolean mDamaged;
 
-	private final float RUN_SPEED = 64;
-	private float mCurrentMoveSpeed = 4 * 32F;
+	private final float RUN_SPEED = 4;
+	private float mCurrentMoveSpeed = 16F;
 	private float mFixDeltaTime = 1.5F / 60F;
 	private final float SLOWDOWN = 3F;
 
@@ -155,7 +155,6 @@ public class Player implements KeyListener {
 	}
 
 	public void tick(double deltaTime) {
-
 		mPlayerMM.tick();
 		mPlayerStats.tick();
 		//mPlayerActions.tick();
@@ -177,34 +176,26 @@ public class Player implements KeyListener {
 						- mRenderDistanceHeight * 32 / 2 + mHeight / 2),
 				mRenderDistanceWidth * 32, mRenderDistanceHeight * 32);
 
-		float moveAmountUP = (float) (mStartSpeedUp * mFixDeltaTime);
-		float moveAmountDOWN = (float) (mStartSpeedDown * mFixDeltaTime);
-		float moveAmountLEFT = (float) (mStartSpeedLeft * mFixDeltaTime);
-		float moveAmountRIGHT = (float) (mStartSpeedRight * mFixDeltaTime);
+		float moveAmountUP = (float) (mStartSpeedUp * deltaTime);
+		float moveAmountDOWN = (float) (mStartSpeedDown * deltaTime);
+		float moveAmountLEFT = (float) (mStartSpeedLeft * deltaTime);
+		float moveAmountRIGHT = (float) (mStartSpeedRight * deltaTime);
 
 		if (mMovingUp) {
 			moveMapUp(moveAmountUP);
 			animationState = 0;
-		} else {
-			moveMapUpGlide(moveAmountUP);
-		}
+		} 
 		if (mMovingDown) {
 			moveMapDown(moveAmountDOWN);
 			animationState = 1;
-		} else {
-			moveMapDownGlide(moveAmountDOWN);
 		}
 		if (mMovingLeft) {
 			moveMapLeft(moveAmountLEFT);
 			animationState = 2;
-		} else {
-			moveMapLeftGlide(moveAmountLEFT);
 		}
 		if (mMovingRight) {
 			moveMapRight(moveAmountRIGHT);
 			animationState = 3;
-		} else {
-			moveMapRightGlide(moveAmountRIGHT);
 		}
 
 		if (!mMovingUp && !mMovingDown && !mMovingRight && !mMovingLeft) {

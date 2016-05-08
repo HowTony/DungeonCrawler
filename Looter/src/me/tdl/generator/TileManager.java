@@ -23,20 +23,22 @@ public class TileManager {
 
 			// we can move the blocks to the right
 			// eachBlock.mPostion.add(new Vector2F(1, 0));
+			
+			eachBlock.setAlive(true);
 
-			if (Player.s_Render.intersects(eachBlock)) {
-				eachBlock.setAlive(true);
-
-				if (!mLoadedBlocks.contains(eachBlock)) {
-					mLoadedBlocks.add(eachBlock);
-				}
-
-			} else {
-				if (mLoadedBlocks.contains(eachBlock)) {
-					mLoadedBlocks.remove(eachBlock);
-				}
-				eachBlock.setAlive(false);
-			}
+//			if (Player.s_Render.intersects(eachBlock)) {
+//				eachBlock.setAlive(true);
+//
+//				if (!mLoadedBlocks.contains(eachBlock)) {
+//					mLoadedBlocks.add(eachBlock);
+//				}
+//
+//			} else {
+//				if (mLoadedBlocks.contains(eachBlock)) {
+//					mLoadedBlocks.remove(eachBlock);
+//				}
+//				eachBlock.setAlive(false);
+//			}
 		}
 		
 		
